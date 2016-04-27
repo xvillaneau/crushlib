@@ -4,6 +4,9 @@
 # Packaging
 /*.egg-info
 
+# Vagrant
+/.vagrant
+
 # Configuration
 /*.cfg
 
