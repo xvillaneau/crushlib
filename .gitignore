@@ -1,2 +1,12 @@
 # Virtual environment
 /venv/
+
+# Packaging
+/*.egg-info
+
+# Configuration
+/*.cfg
+
+# Python
+*.pyc
+*.pyo
