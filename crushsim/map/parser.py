@@ -1,9 +1,11 @@
 
+from crushsim.map.tunables import Tunables
 import re
 
 
-def parse_raw(crushmap):
-    return _raw_to_dict(crushmap)
+def parse_raw(crushmap, map_obj):
+    parsed = _raw_to_dict(crushmap)
+    map_obj.tunables = parse_tunables(parsed['tunable'])
 
 
 def _raw_to_dict(raw_str):
@@ -32,9 +34,29 @@ def _raw_to_dict(raw_str):
                 raw_dict[head].append(l)
             else:
                 if not l.endswith('{'):
-                    raise IOError("CRUSH Parsing error")
+                    raise ValueError("CRUSH Parsing error")
                 in_block = True
                 block = [l]
                 block_type = 'rule' if head == 'rule' else 'bucket'
                 raw_dict.setdefault(block_type, [])
     return raw_dict
+
+
+def parse_tunables(tun_list):
+    tun_obj = Tunables()
+    for raw in tun_list:
+        line = raw.split()
+        if line[0] != 'tunable':
+            raise ValueError("Tunable Parsing error: Line should begin "
+                             "with 'tunable'")
+        try:
+            name = line[1]
+            value = int(line[2])
+        except IndexError:
+            raise ValueError("Tunable Parsing error: Tunable declaration "
+                             " is incomplete!")
+        except ValueError:
+            raise ValueError("Tunable Parsing error: Tunable value expected "
+                             "to be an integer!")
+        tun_obj.update_setting(name, value)
+    return tun_obj

@@ -1,13 +1,14 @@
 
 # from crushsim import utils
-# from crushsim.map import parser
+from crushsim.map import parser
 
 
 class Map():
 
     def __init__(self):
-        self.buckets = None
+        self.tunables = None
 
     def read_file(self, crush_filename):
         with open(crush_filename) as f:
-            self.raw_input = f.read()
+            self.raw_map = f.read()
+        parser.parse_raw(self.raw_map, self)
