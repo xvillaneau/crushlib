@@ -1,11 +1,13 @@
 
 from crushsim.map.tunables import Tunables
+from crushsim.map.devices import Devices
 import re
 
 
 def parse_raw(crushmap, map_obj):
     parsed = _raw_to_dict(crushmap)
     map_obj.tunables = parse_tunables(parsed['tunable'])
+    map_obj.devices = parse_devices(parsed['device'])
 
 
 def _raw_to_dict(raw_str):
@@ -60,3 +62,32 @@ def parse_tunables(tun_list):
                              "to be an integer!")
         tun_obj.update_setting(name, value)
     return tun_obj
+
+
+def parse_devices(dev_list):
+    dev_obj = Devices()
+    for raw in dev_list:
+        line = raw.split()
+        if line[0] != 'device':
+            raise ValueError("Device parsing error: Line should begin "
+                             "with 'device'")
+
+        try:
+            num = int(line[1])
+            name = line[2]
+        except IndexError:
+            raise ValueError("Device parsing error: Device declaration "
+                             "is incomplete!")
+        except ValueError:
+            raise ValueError("Device parsing error: Device number expected "
+                             "to be an integer!")
+
+        if name == ('osd.{}'.format(num)):
+            dev_obj.add(num)
+        elif name == ('device{}'.format(num)):
+            continue
+        else:
+            raise ValueError("Device parsing error: Unrecognized name {} for "
+                             "number {}".format(name, num))
+
+    return dev_obj

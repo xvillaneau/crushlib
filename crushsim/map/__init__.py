@@ -7,6 +7,7 @@ class Map():
 
     def __init__(self):
         self.tunables = None
+        self.devices = None
 
     def read_file(self, crush_filename):
         with open(crush_filename) as f:
