@@ -33,6 +33,17 @@ class TestTypes(unittest.TestCase):
         self.assertFalse(self.types.exists(id=0))
         self.assertFalse(self.types.exists(name='osd'))
 
+    def test_createset(self):
+        """Test success path for Types.create_set()"""
+        self.types.create_set(['osd', 'host', 'root'])
+        self.assertDictEqual(self.types.get(name='osd'),
+                             {'id': 0, 'name': 'osd'})
+        self.assertDictEqual(self.types.get(name='host'),
+                             {'id': 1, 'name': 'host'})
+        self.assertDictEqual(self.types.get(name='root'),
+                             {'id': 2, 'name': 'root'})
+        self.assertEqual(len(self.types.get()), 3)
+
     def test_add_except(self):
         """Test exceptions returned by Types.add()"""
         with self.assertRaises(TypeError):
@@ -69,3 +80,17 @@ class TestTypes(unittest.TestCase):
             self.types.exists(id="string")
         with self.assertRaises(ValueError):
             self.types.exists(name="")
+
+    def test_createset_except(self):
+        """Test exceptions returned by Types.create_set()"""
+        with self.assertRaises(TypeError):
+            self.types.create_set('71Li212')
+        with self.assertRaises(TypeError):
+            self.types.create_set(['osd', 1234, 'root'])
+        with self.assertRaises(ValueError):
+            self.types.create_set([])
+        with self.assertRaises(ValueError):
+            self.types.create_set(['osd', 'osd', 'host'])
+        self.types.add('osd', 0)
+        with self.assertRaises(IndexError):
+            self.types.create_set(['test', 'shoud', 'fail'])

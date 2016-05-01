@@ -50,3 +50,20 @@ class Types():
         except IndexError:
             return False
         return True
+
+    def create_set(self, type_list):
+        if self.get():
+            raise IndexError("This can only be run on an empty set of types")
+
+        if type(type_list) is not list:
+            raise TypeError("Input must be a list of strings")
+        for t in type_list:
+            if type(t) not in (str, unicode):
+                raise TypeError("Input must be a list of strings")
+
+        if not type_list:
+            raise ValueError("Input cannot be an empty list")
+        if len(type_list) != len(set(type_list)):
+            raise ValueError("All elements in input must be unique")
+
+        self.list = [{'name': e, 'id': type_list.index(e)} for e in type_list]
