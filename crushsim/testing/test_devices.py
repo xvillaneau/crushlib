@@ -30,3 +30,20 @@ class TestDevices(unittest.TestCase):
             self.dev.add('string')
         with self.assertRaises(ValueError):
             self.dev.add(-1)
+
+    def test_create_bunch(self):
+        """Testing behavior of Devices.create_bunch()"""
+        self.assertIsNone(self.dev.create_bunch(71))
+        self.assertEqual(self.dev.get_next_number(), 71)
+
+    def test_create_bunch_except(self):
+        """Testing exceptions raised by Devices.create_bunch()"""
+        with self.assertRaises(ValueError):
+            self.dev.create_bunch('string')
+        with self.assertRaises(ValueError):
+            self.dev.create_bunch(0)
+        with self.assertRaises(ValueError):
+            self.dev.create_bunch(-167)
+        self.dev.add()
+        with self.assertRaises(IndexError):
+            self.dev.create_bunch(66)
