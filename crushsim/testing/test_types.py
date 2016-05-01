@@ -34,7 +34,7 @@ class TestTypes(unittest.TestCase):
         self.assertFalse(self.types.exists(name='osd'))
 
     def test_add_except(self):
-        """Test exceptiosn returned by Types.add()"""
+        """Test exceptions returned by Types.add()"""
         with self.assertRaises(TypeError):
             self.types.add(71, 0)
         with self.assertRaises(TypeError):
@@ -48,7 +48,7 @@ class TestTypes(unittest.TestCase):
             self.types.add('osd', 1)
 
     def test_get_except(self):
-        """Test exceptiosn returned by Types.get()"""
+        """Test exceptions returned by Types.get()"""
         with self.assertRaises(TypeError):
             self.types.get(name=71)
         with self.assertRaises(TypeError):
@@ -62,9 +62,9 @@ class TestTypes(unittest.TestCase):
             self.types.get(id=1)
 
     def test_exists_except(self):
-        """Test exceptiosn returned by Types.exists()"""
+        """Test exceptions returned by Types.exists()"""
         with self.assertRaises(TypeError):
-            self.types.exits(name=71)
+            self.types.exists(name=71)
         with self.assertRaises(TypeError):
             self.types.exists(id="string")
         with self.assertRaises(ValueError):
