@@ -3,6 +3,7 @@
 
 # Packaging
 /*.egg-info
+/.eggs
 
 # Vagrant
 /.vagrant
