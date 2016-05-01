@@ -1,9 +1,9 @@
 
-import os
 import unittest
 from crushsim.map import Map
 
-files_dir = os.path.join(os.path.dirname(__file__), 'files')
+import os
+FILES_DIR = os.path.join(os.path.dirname(__file__), 'files')
 
 
 class TestParsing(unittest.TestCase):
@@ -15,10 +15,12 @@ class TestParsing(unittest.TestCase):
         self.crushmap = None
 
     def test_base_import(self):
-        crushfile = os.path.join(files_dir, 'crushmap_complete.txt')
+        """Basic import success path for a simple map"""
+        crushfile = os.path.join(FILES_DIR, 'crushmap_complete.txt')
         self.crushmap.read_file(crushfile)
 
     def test_import_missingdev(self):
-        crushfile = os.path.join(files_dir, 'crushmap_missingdev.txt')
+        """Import of a map in which osd.7 is absent"""
+        crushfile = os.path.join(FILES_DIR, 'crushmap_missingdev.txt')
         self.crushmap.read_file(crushfile)
         self.assertEqual(self.crushmap.devices.get_next_number(), 7)
