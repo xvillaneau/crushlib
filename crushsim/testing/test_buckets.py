@@ -8,18 +8,19 @@ from crushsim.map.buckets import Buckets
 class TestBuckets(unittest.TestCase):
 
     def setUp(self):
-        self.buckets = Buckets()
-
         self.devices = Devices()
         self.devices.create_bunch(16)
 
         self.types = Types()
-        self.types.create_set(['osd', 'host', 'psu', 'root'])
+        self.types.create_set(['host', 'psu', 'root'])
+
+        self.buckets = Buckets(self.types, self.devices)
 
     def tearDown(self):
         self.buckets = None
 
     def test_add(self):
+        """Test success path for Buckets.add()"""
         b_dict_host0 = {
             'name': 'host0',
             'type': 'host',
@@ -43,6 +44,7 @@ class TestBuckets(unittest.TestCase):
         b_dict_psu0 = {
             'name': 'psu0',
             'type': 'psu',
+            'alg': 'tree',
             'item': [
                 {'name': 'host0'},
                 {'name': 'host1'}
