@@ -1,0 +1,25 @@
+# Virtual environment
+/venv/
+
+# Packaging
+/*.egg-info
+/.eggs
+
+# Vagrant
+/.vagrant
+
+# Configuration
+/*.cfg
+
+# Python
+*.pyc
+*.pyo
+
+# PyCharm
+/.idea
+
+# Local crushtool executable
+/crushtool
+
+# Maps for developnet
+/maps
