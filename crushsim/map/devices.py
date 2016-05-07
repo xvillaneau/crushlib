@@ -30,6 +30,25 @@ class Devices():
         nums = [dev.id for dev in self.__list]
         return (id in nums)
 
+    def get(self, name=None, id=None):
+
+        # Argument checking
+        if not (id is None or name is None):
+            raise ValueError("Only id or name can be searched at once")
+
+        # Processing the actual request
+        if id is not None:
+            tmp = [d for d in self.__list if d.id == id]
+        elif name is not None:
+            tmp = [d for d in self.__list if d.name == name]
+        else:
+            return self.__list
+
+        if not tmp:
+            raise IndexError("Could not find device with {}={}".format(
+                'name' if name else 'id', name if name else id))
+        return tmp[0]
+
     def create_bunch(self, num):
         if len(self.__list) != 0:
             raise IndexError(
@@ -49,4 +68,7 @@ class Device():
 
         self.id = id
         self.name = "osd.{}".format(id)
-        self.buckets = []
+        self.is_item_of = []
+
+    def link_bucket(self, bucket):
+        self.is_item_of.append(bucket)

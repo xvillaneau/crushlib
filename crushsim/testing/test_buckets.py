@@ -1,7 +1,7 @@
 
 import unittest
 from crushsim.map.devices import Devices
-from crushsim.map.Types import Types
+from crushsim.map.types import Types
 from crushsim.map.buckets import Buckets
 
 
@@ -50,6 +50,6 @@ class TestBuckets(unittest.TestCase):
                 {'name': 'host1'}
             ]
         }
-        self.buckets.add(b_dict_host0)
-        self.buckets.add(b_dict_host1)
-        self.buckets.add(b_dict_psu0)
+        self.buckets.add_from_dict(b_dict_host0)
+        self.buckets.add_from_dict(b_dict_host1)
+        self.buckets.add_from_dict(b_dict_psu0)

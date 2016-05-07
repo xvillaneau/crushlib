@@ -77,3 +77,6 @@ class Type():
         self.name = name
         self.id = id
         self.buckets = []
+
+    def link_bucket(self, bucket_obj):
+        self.buckets.append(bucket_obj)
