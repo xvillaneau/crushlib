@@ -1,6 +1,6 @@
 
 import unittest
-from crushsim.map.types import Types
+from crushsim.map.types import Types, Type
 
 
 class TestTypes(unittest.TestCase):
@@ -13,17 +13,19 @@ class TestTypes(unittest.TestCase):
 
     def test_add(self):
         """Test success path for Types.add()"""
-        self.types.add("osd", 0)
+        self.types.add("host", 0)
         self.types.add("root", 3)
 
     def test_get(self):
         """Test success path for Types.get()"""
-        self.types.add("osd", 0)
+        self.types.add("host", 0)
         self.types.add("root", 3)
-        self.assertDictEqual(self.types.get(id=0), {'id': 0, 'name': 'osd'})
-        self.assertDictEqual(self.types.get(name='osd'),
-                             {'id': 0, 'name': 'osd'})
-        self.assertIn({'id': 3, 'name': 'root'}, self.types.get())
+        self.assertIsInstance(self.types.get(id=0), Type)
+        self.assertDictContainsSubset({'name': 'host', 'id': 0},
+                                      self.types.get(id=0).__dict__)
+        self.assertDictContainsSubset({'name': 'host', 'id': 0},
+                                      self.types.get(name='host').__dict__)
+        self.assertIn(self.types.get(id=3), self.types.get())
 
     def test_exists(self):
         """Test success path for Types.exists()"""
@@ -36,12 +38,12 @@ class TestTypes(unittest.TestCase):
     def test_createset(self):
         """Test success path for Types.create_set()"""
         self.types.create_set(['osd', 'host', 'root'])
-        self.assertDictEqual(self.types.get(name='osd'),
-                             {'id': 0, 'name': 'osd'})
-        self.assertDictEqual(self.types.get(name='host'),
-                             {'id': 1, 'name': 'host'})
-        self.assertDictEqual(self.types.get(name='root'),
-                             {'id': 2, 'name': 'root'})
+        self.assertDictContainsSubset({'id': 0, 'name': 'osd'},
+                                      self.types.get(name='osd').__dict__)
+        self.assertDictContainsSubset({'id': 1, 'name': 'host'},
+                                      self.types.get(name='host').__dict__)
+        self.assertDictContainsSubset({'id': 2, 'name': 'root'},
+                                      self.types.get(name='root').__dict__)
         self.assertEqual(len(self.types.get()), 3)
 
     def test_add_except(self):
