@@ -18,7 +18,7 @@ class TestDevices(unittest.TestCase):
 
     def test_add_specnum(self):
         """Adding a device with specified number returns """
-        self.assertEqual(self.dev.add('2'), 2)
+        self.assertEqual(self.dev.add(2), 2)
         self.assertEqual(self.dev.add(0), 0)
 
         with self.assertRaises(IndexError):

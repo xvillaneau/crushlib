@@ -2,42 +2,51 @@
 class Devices():
 
     def __init__(self):
-        self.list = []
+        self.__list = []
 
-    def add(self, num=None):
+    def add(self, id=None):
 
-        if not num:
-            num = self.get_next_number()
+        if id is None:
+            id = self.get_next_number()
+        if self.exists(id):
+            raise IndexError("Device {} already exists".format(id))
 
-        try:
-            num = int(num)
-            if num < 0:
-                raise ValueError
-        except ValueError:
-            raise ValueError(
-                "Devices must be identified by a positive integer")
+        self.__list.append(Device(id))
 
-        if num not in self.list:
-            self.list.append(num)
-        else:
-            raise IndexError("Device {} already exists".format(num))
-
-        return num
+        return id
 
     def get_next_number(self):
 
-        if not self.list:
+        if not self.__list:
             return 0
 
-        candidates = [x for x in range(0, max(self.list) + 2)
-                      if x not in self.list]
+        nums = [dev.id for dev in self.__list]
+        candidates = [x for x in range(0, max(nums) + 2) if x not in nums]
         return min(candidates)
 
+    def exists(self, id):
+        if type(id) is not int or id < 0:
+            raise ValueError("Expecting id to be a positive integer")
+        nums = [dev.id for dev in self.__list]
+        return (id in nums)
+
     def create_bunch(self, num):
-        if self.get_next_number() != 0:
+        if len(self.__list) != 0:
             raise IndexError(
                 "Devices.create_bunch() can only be used on an empty set!")
         if type(num) is not int or num < 1:
             raise ValueError(
-                "Devices must be identified by a positive integer")
-        self.list = range(0, num)
+                "Expecting num to be a strictly positive integer")
+        self.__list = [Device(i) for i in range(0, num)]
+
+
+class Device():
+
+    def __init__(self, id):
+
+        if type(id) is not int or id < 0:
+            raise ValueError("Expecting id to be a positive integer")
+
+        self.id = id
+        self.name = "osd.{}".format(id)
+        self.buckets = []
