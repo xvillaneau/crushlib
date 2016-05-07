@@ -1,5 +1,7 @@
 
-from crushsim.map.devices import Device
+import math
+from crushsim.map.devices import Devices, Device
+from crushsim.map.types import Types
 
 
 class Buckets():
@@ -71,6 +73,53 @@ class Buckets():
         except IndexError:
             return False
         return True
+
+    @staticmethod
+    def create_tree(osds, layers=[]):
+        """Creates a tree of buckets, the same way crushtool --build does"""
+        devs = Devices()
+        devs.create_bunch(osds)
+
+        types_list = ['osd'] + [l['type'] for l in layers]
+        types = Types()
+        types.create_set(types_list)
+
+        buckets = Buckets(types, devs)
+        children = ['osd.{}'.format(i) for i in range(0, osds)]
+
+        def _gen_item(name):
+            out = {'name': name}
+            if name.startswith('osd.'):
+                out['weight'] = 1.0
+            return out
+
+        for layer in layers:
+            b_dict = {}
+            b_dict['alg'] = layer.get('alg', 'straw')
+            size = layer.get('size', 0)
+            ltype = layer['type']
+
+            if size == 0:
+                b_dict['name'] = ltype
+                b_dict['type'] = ltype
+                b_dict['item'] = map(_gen_item, children)
+                buckets.add_from_dict(b_dict)
+                children = [ltype]
+                continue
+
+            # If size > 0
+            next_children = []
+            num_items = int(math.ceil(float(len(children)) / size))
+            for i in range(0, num_items):
+                sub_children = children[(i * size):((i+1) * size)]
+                b_dict['name'] = '{}{}'.format(ltype, i)
+                b_dict['type'] = ltype
+                b_dict['item'] = map(_gen_item, sub_children)
+                buckets.add_from_dict(b_dict)
+                next_children.append(b_dict['name'])
+            children = next_children
+
+        return buckets
 
 
 class Bucket():

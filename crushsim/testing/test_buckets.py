@@ -78,6 +78,14 @@ class TestBuckets(unittest.TestCase):
         self.assertEqual(self.buckets.next_id(), -4)
 
     def test_exists(self):
+        """Test for Buckets.exists()"""
         self.test_addfromdict()
         self.assertTrue(self.buckets.exists('host0'))
         self.assertFalse(self.buckets.exists('testABC'))
+
+    def test_createtree(self):
+        """Test for Buckets.next_id()"""
+        layers = [{'type': 'host', 'size': 4}, {'type': 'root'}]
+        b = Buckets.create_tree(15, layers)
+        self.assertEqual(len(b.get(name='root').items), 4)
+        self.assertEqual(len(b.get(name='host3').items), 3)
