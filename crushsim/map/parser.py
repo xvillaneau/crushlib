@@ -7,6 +7,7 @@ def parse_raw(crushmap, map_obj):
     parse_tunables(map_obj, parsed['tunable'])
     parse_devices(map_obj, parsed['device'])
     parse_types(map_obj, parsed['type'])
+    parse_buckets(map_obj, parsed['bucket'])
 
 
 def _raw_to_dict(raw_str):
@@ -102,3 +103,35 @@ def parse_types(map_obj, types_list):
                              "to be an integer!")
 
         map_obj.types.add(name, id)
+
+
+def parse_buckets(map_obj, buckets_list):
+
+    def parse_bucket(bucket_raw):
+        out = {'item': []}
+        for string in bucket_raw:
+            line = string.split()
+            head = line[0]
+            value = line[1]
+
+            if line[-1] == '{':  # First line: open bucket declaration
+                out['type'] = head
+                out['name'] = value
+            elif head == 'item':
+                item = {'name': value, 'weight': float(line[3])}
+                out['item'].append(item)
+            elif head == 'id':
+                out['id'] = int(value)
+            elif head == 'alg':
+                out['alg'] = value
+            elif head == 'hash':
+                if value == '0':
+                    out['hash'] = 'rjenkins1'
+                else:
+                    raise ValueError("Unknown hash {}".format(value))
+            else:
+                raise ValueError("Unknown property {}".format(head))
+        return out
+
+    for bucket_raw in buckets_list:
+        map_obj.buckets.add_from_dict(parse_bucket(bucket_raw))
