@@ -101,8 +101,7 @@ class Buckets():
     @staticmethod
     def create_tree(osds, layers=[]):
         """Creates a tree of buckets, the same way `crushtool --build` does"""
-        devs = Devices()
-        devs.create_bunch(osds)
+        devs = Devices.create_bunch(osds)
 
         types_list = ['osd'] + [l['type'] for l in layers]
         types = Types()

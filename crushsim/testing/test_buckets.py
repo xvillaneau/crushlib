@@ -8,8 +8,7 @@ from crushsim.map.buckets import Buckets, Bucket
 class TestBuckets(unittest.TestCase):
 
     def setUp(self):
-        self.devices = Devices()
-        self.devices.create_bunch(16)
+        self.devices = Devices.create_bunch(16)
 
         self.types = Types()
         self.types.create_set(['host', 'psu', 'root'])
