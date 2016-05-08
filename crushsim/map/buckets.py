@@ -39,6 +39,8 @@ class Buckets():
 
         if self.exists(name):
             raise IndexError("Bucket {} already exists".format(name))
+        if self.devices.exists(name=name):
+            raise IndexError("{} already exists as a device".format(name))
 
         id = self.next_id()
         bucket = Bucket(name, id, type_obj, alg, hash_name)
@@ -46,7 +48,7 @@ class Buckets():
         for item in items:
             if not item.get('name'):
                 raise ValueError("All item must be identified with a name")
-            if item['name'].startswith('osd.'):
+            if self.devices.exists(name=item['name']):
                 if type(item.get('weight')) is not float:
                     raise ValueError('Buckets with devices as items must '
                                      'specify their weight as a float.')
@@ -111,7 +113,7 @@ class Buckets():
 
         def _gen_item(name):
             out = {'name': name}
-            if name.startswith('osd.'):
+            if devs.exists(name=name):
                 out['weight'] = 1.0
             return out
 
