@@ -5,12 +5,31 @@ from crushsim.map.types import Types
 
 
 class Buckets():
+    """Handles and manages a set of buckets.
+    Arguments:
+    - types: Types object that keeps track of all types in the map
+    - devices: Devices object that keeps track of all devices in the map
+    """
+
     def __init__(self, types, devices):
+        """Buckets constructor."""
         self.types = types
         self.devices = devices
         self.__list = []
 
     def add_from_dict(self, data):
+        """Creates a new bucket from a dict.
+        The dict is expected to have at least the following keys:
+        - name: Name of the bucket (unique)
+        - type: Name of the type this bucket will be of
+        Optional keys are:
+        - alg: Algorithm to use for CRUSH (default: straw)
+        - hash: Hash to use (default: rjenkins1)
+        - item: list of items to put into the bucket (default: [])
+        Items are expected to be dicts with the followinf keys:
+        - name: name of an existing bucket or device
+        - weight: float value for weight, only if the item is a device
+        """
         name = data['name']
         type_name = data['type']
         type_obj = self.types.get(name=type_name)
@@ -35,12 +54,13 @@ class Buckets():
                 weight = item.get('weight')
             else:
                 obj = self.get(name=item['name'])
-                weight = 0
+                weight = 0.0
             bucket.add_item(obj, weight)
 
         self.__list.append(bucket)
 
     def next_id(self):
+        """Returns the ID of the next bucket to be created"""
         if not self.__list:
             return -1
 
@@ -49,6 +69,7 @@ class Buckets():
         return max(candidates)
 
     def get(self, name=None, id=None):
+        """Returns one or all buckets, searched by name or ID"""
 
         # Argument checking
         if not (id is None or name is None):
@@ -68,6 +89,7 @@ class Buckets():
         return tmp[0]
 
     def exists(self, name):
+        """Check if a bucket of a given name exists"""
         try:
             self.get(name=name)
         except IndexError:
@@ -76,7 +98,7 @@ class Buckets():
 
     @staticmethod
     def create_tree(osds, layers=[]):
-        """Creates a tree of buckets, the same way crushtool --build does"""
+        """Creates a tree of buckets, the same way `crushtool --build` does"""
         devs = Devices()
         devs.create_bunch(osds)
 
@@ -123,6 +145,15 @@ class Buckets():
 
 
 class Bucket():
+    """Represents a single bucket, its properties and items. Also keeps track
+    of any parent buckets.
+    Arguments:
+    - name: Unique name for this bucket
+    - id: Unique integer ID for this bucket
+    - type_obj: Type object referring to the bucket's type
+    - alg: CRUSH algorith (default: straw)
+    - hash_name: Name of the hash to use (default: rjenkins1)
+    """
 
     def __init__(self, name, id, type_obj, alg='straw', hash_name='rjenkins1'):
 
@@ -139,7 +170,10 @@ class Bucket():
 
         self.type.link_bucket(self)
 
+    # TODO: Destroy handler that un-links bucket to the Type
+
     def add_item(self, obj, weight=1.0):
+        """Adds an item to the bucket, at the end of the list"""
         item = {'obj': obj}
         if isinstance(obj, Device):
             item['weight'] = weight
@@ -147,4 +181,5 @@ class Bucket():
         self.items.append(item)
 
     def link_bucket(self, bucket):
+        """Used when a parent bucket declares this bucket as item"""
         self.is_item_of.append(bucket)
