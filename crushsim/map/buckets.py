@@ -104,8 +104,7 @@ class Buckets():
         devs = Devices.create_bunch(osds)
 
         types_list = ['osd'] + [l['type'] for l in layers]
-        types = Types()
-        types.create_set(types_list)
+        types = Types.create_set(types_list)
 
         buckets = Buckets(types, devs)
         children = ['osd.{}'.format(i) for i in range(0, osds)]

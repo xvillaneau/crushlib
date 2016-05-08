@@ -10,8 +10,7 @@ class TestBuckets(unittest.TestCase):
     def setUp(self):
         self.devices = Devices.create_bunch(16)
 
-        self.types = Types()
-        self.types.create_set(['host', 'psu', 'root'])
+        self.types = Types.create_set(['osd', 'host', 'psu', 'root'])
 
         self.buckets = Buckets(self.types, self.devices)
 
