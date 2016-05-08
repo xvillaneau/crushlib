@@ -23,4 +23,4 @@ class TestParsing(unittest.TestCase):
         """Import of a map in which osd.7 is absent"""
         crushfile = os.path.join(FILES_DIR, 'crushmap_missingdev.txt')
         self.crushmap.read_file(crushfile)
-        self.assertEqual(self.crushmap.devices.get_next_number(), 7)
+        self.assertEqual(self.crushmap.devices.next_id(), 7)

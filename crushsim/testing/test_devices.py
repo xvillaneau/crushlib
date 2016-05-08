@@ -27,18 +27,25 @@ class TestDevices(unittest.TestCase):
         with self.assertRaises(IndexError):
             self.dev.add(2)
 
+    def test_exists(self):
+        self.dev.add(1)
+        self.assertTrue(self.dev.exists(id=1))
+        self.assertTrue(self.dev.exists(name='osd.1'))
+        self.assertFalse(self.dev.exists(id=0))
+        self.assertFalse(self.dev.exists(name='testABC'))
+
     def test_getnextnum(self):
-        self.assertEqual(self.dev.get_next_number(), 0)
+        self.assertEqual(self.dev.next_id(), 0)
         self.dev.add()
         self.dev.add(2)
-        self.assertEqual(self.dev.get_next_number(), 1)
+        self.assertEqual(self.dev.next_id(), 1)
         self.dev.add()
-        self.assertEqual(self.dev.get_next_number(), 3)
+        self.assertEqual(self.dev.next_id(), 3)
 
     def test_create_bunch(self):
         """Testing behavior of Devices.create_bunch()"""
         self.assertIsNone(self.dev.create_bunch(71))
-        self.assertEqual(self.dev.get_next_number(), 71)
+        self.assertEqual(self.dev.next_id(), 71)
 
     def test_create_bunch_except(self):
         """Testing exceptions raised by Devices.create_bunch()"""

@@ -7,15 +7,15 @@ class Devices():
     def add(self, id=None):
 
         if id is None:
-            id = self.get_next_number()
-        if self.exists(id):
+            id = self.next_id()
+        if self.exists(id=id):
             raise IndexError("Device {} already exists".format(id))
 
         self.__list.append(Device(id))
 
         return id
 
-    def get_next_number(self):
+    def next_id(self):
 
         if not self.__list:
             return 0
@@ -24,11 +24,12 @@ class Devices():
         candidates = [x for x in range(0, max(nums) + 2) if x not in nums]
         return min(candidates)
 
-    def exists(self, id):
-        if type(id) is not int or id < 0:
-            raise ValueError("Expecting id to be a positive integer")
-        nums = [dev.id for dev in self.__list]
-        return (id in nums)
+    def exists(self, name=None, id=None):
+        try:
+            self.get(name=name, id=id)
+        except IndexError:
+            return False
+        return True
 
     def get(self, name=None, id=None):
 
