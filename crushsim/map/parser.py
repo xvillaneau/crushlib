@@ -6,6 +6,7 @@ def parse_raw(crushmap, map_obj):
     parsed = _raw_to_dict(crushmap)
     parse_tunables(map_obj, parsed['tunable'])
     parse_devices(map_obj, parsed['device'])
+    parse_types(map_obj, parsed['type'])
 
 
 def _raw_to_dict(raw_str):
@@ -81,3 +82,23 @@ def parse_devices(map_obj, dev_list):
             map_obj.devices.add(num)
         else:
             continue
+
+
+def parse_types(map_obj, types_list):
+    for string in types_list:
+        line = string.split()
+        if line[0] != 'type':
+            raise ValueError(
+                "Types Parsing error: Line shoudl begin with 'type'")
+
+        try:
+            id = int(line[1])
+            name = line[2]
+        except IndexError:
+            raise ValueError("Types Parsing error: Type declaration "
+                             " is incomplete!")
+        except ValueError:
+            raise ValueError("Type Parsing error: Type ID expected "
+                             "to be an integer!")
+
+        map_obj.types.add(name, id)
