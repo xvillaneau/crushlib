@@ -19,3 +19,17 @@ class Map():
         with open(crush_filename) as f:
             self.raw_map = f.read()
         parser.parse_raw(self.raw_map, self)
+
+    def get_item(self, name=None, id=None):
+        item = None
+        try:
+            item = self.devices.get(name=name, id=id)
+        except IndexError:
+            pass
+        try:
+            item = self.buckets.get(name=name, id=id)
+        except IndexError:
+            pass
+        if item is None:
+            raise IndexError("Could not find item")
+        return item

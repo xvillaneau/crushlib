@@ -1,5 +1,7 @@
 
 from crushsim.map import Map
+from crushsim.map.buckets import Bucket
+from crushsim.map.devices import Device
 
 
 class Rules():
@@ -69,7 +71,7 @@ class Rule():
         assert type(min_size) is int
         assert type(max_size) is int
 
-        self.crushmap = crushmap
+        self.map = crushmap
         self.name = rule_name
         self.id = rule_id
         self.type = rule_type
@@ -77,15 +79,33 @@ class Rule():
         self.max_size = max_size
 
         if steps is None:
-            steps = Steps(crushmap)
+            steps = Steps(self.map)
             steps.default()
         self.steps = steps
 
 
 class Steps():
 
-    def __init__(self, buckets):
+    def __init__(self, crushmap):
+
+        assert isinstance(crushmap, Map)
+
         self.__list = []
-        self.types = buckets.types
-        self.devices = buckets.devices
-        self.buckets = buckets
+        self.map = crushmap
+
+    def add(self, op, **kwargs):
+
+        assert type(op) is str
+
+        if op == 'take':
+            item = kwargs.get("item")
+            assert item is not None
+            return self.__add_take(item)
+        raise ValueError()
+
+    def __add_take(self, item):
+
+        if type(item) is str:
+            item = self.map.get_item(name=item)
+        assert isinstance(item, Device) or isinstance(item, Bucket)
+        self.__list.append({"op": "take", "item": item})
