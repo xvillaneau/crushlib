@@ -1,4 +1,7 @@
 
+from crushsim.map import Map
+
+
 class Rules():
 
     def __init__(self, buckets):
@@ -53,7 +56,30 @@ class Rules():
 
 
 class Rule():
-    pass
+
+    def __init__(self, crushmap, rule_name, rule_id=None, steps=None,
+                 rule_type='replicated', min_size=1, max_size=10):
+
+        # Argument checking
+        assert isinstance(crushmap, Map)
+        assert type(rule_name) is str
+        assert rule_id is None or (type(rule_id) is int and rule_id >= 0)
+        assert steps is None or isinstance(steps, Steps)
+        assert rule_type in ('replicated', 'erasure')
+        assert type(min_size) is int
+        assert type(max_size) is int
+
+        self.crushmap = crushmap
+        self.name = rule_name
+        self.id = rule_id
+        self.type = rule_type
+        self.min_size = min_size
+        self.max_size = max_size
+
+        if steps is None:
+            steps = Steps(crushmap)
+            steps.default()
+        self.steps = steps
 
 
 class Steps():
