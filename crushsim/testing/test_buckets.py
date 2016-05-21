@@ -1,20 +1,15 @@
 
 import unittest
 from crushsim.map import Map
-from crushsim.map.devices import Devices
-from crushsim.map.types import Types
-from crushsim.map.buckets import Buckets, Bucket
+from crushsim.map.buckets import Bucket
 
 
 class TestBuckets(unittest.TestCase):
 
     def setUp(self):
         self.crushmap = Map()
-        self.crushmap.devices = Devices.create_bunch(16)
-
+        self.crushmap.devices.create_bunch(16)
         self.crushmap.types.create_set(['osd', 'host', 'psu', 'root'])
-
-        self.crushmap.buckets = Buckets(self.crushmap)
 
     def tearDown(self):
         self.crushmap = None

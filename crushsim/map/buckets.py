@@ -109,7 +109,7 @@ class Buckets():
         if self.__list:
             raise IndexError("This can only be done on an empty buckets list")
 
-        self.crushmap.devices = Devices.create_bunch(osds)
+        self.crushmap.devices.create_bunch(osds)
 
         types_list = ['osd'] + [l['type'] for l in layers]
         self.crushmap.types.create_set(types_list)

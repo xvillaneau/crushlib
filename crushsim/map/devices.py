@@ -50,15 +50,16 @@ class Devices():
                 'name' if name else 'id', name if name else id))
         return tmp[0]
 
-    @staticmethod
-    def create_bunch(num):
+    def create_bunch(self, num):
+
+        if self.__list:
+            raise IndexError("Can only be done on an empty Devices list")
         if type(num) is not int or num < 1:
             raise ValueError(
                 "Expecting num to be a strictly positive integer")
-        devs = Devices()
+
         for i in range(0, num):
-            devs.add()
-        return devs
+            self.add()
 
 
 class Device():

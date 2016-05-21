@@ -44,14 +44,14 @@ class TestDevices(unittest.TestCase):
 
     def test_createbunch(self):
         """Testing behavior of Devices.create_bunch()"""
-        devs = Devices.create_bunch(71)
-        self.assertEqual(devs.next_id(), 71)
+        self.dev.create_bunch(71)
+        self.assertEqual(self.dev.next_id(), 71)
 
     def test_createbunch_except(self):
         """Testing exceptions raised by Devices.create_bunch()"""
         with self.assertRaises(ValueError):
-            Devices.create_bunch('string')
+            self.dev.create_bunch('string')
         with self.assertRaises(ValueError):
-            Devices.create_bunch(0)
+            self.dev.create_bunch(0)
         with self.assertRaises(ValueError):
-            Devices.create_bunch(-167)
+            self.dev.create_bunch(-167)
