@@ -37,14 +37,14 @@ class TestTypes(unittest.TestCase):
 
     def test_createset(self):
         """Test success path for Types.create_set()"""
-        types = Types.create_set(['osd', 'host', 'root'])
+        self.types.create_set(['osd', 'host', 'root'])
         self.assertDictContainsSubset({'id': 0, 'name': 'osd'},
-                                      types.get(name='osd').__dict__)
+                                      self.types.get(name='osd').__dict__)
         self.assertDictContainsSubset({'id': 1, 'name': 'host'},
-                                      types.get(name='host').__dict__)
+                                      self.types.get(name='host').__dict__)
         self.assertDictContainsSubset({'id': 2, 'name': 'root'},
-                                      types.get(name='root').__dict__)
-        self.assertEqual(len(types.get()), 3)
+                                      self.types.get(name='root').__dict__)
+        self.assertEqual(len(self.types.get()), 3)
 
     def test_add_except(self):
         """Test exceptions returned by Types.add()"""
@@ -86,10 +86,10 @@ class TestTypes(unittest.TestCase):
     def test_createset_except(self):
         """Test exceptions returned by Types.create_set()"""
         with self.assertRaises(TypeError):
-            Types.create_set('71Li212')
+            self.types.create_set('71Li212')
         with self.assertRaises(TypeError):
-            Types.create_set(['osd', 1234, 'root'])
+            self.types.create_set(['osd', 1234, 'root'])
         with self.assertRaises(ValueError):
-            Types.create_set([])
+            self.types.create_set([])
         with self.assertRaises(ValueError):
-            Types.create_set(['osd', 'osd', 'host'])
+            self.types.create_set(['osd', 'osd', 'host'])

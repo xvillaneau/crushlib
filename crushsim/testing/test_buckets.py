@@ -12,7 +12,7 @@ class TestBuckets(unittest.TestCase):
         self.crushmap = Map()
         self.crushmap.devices = Devices.create_bunch(16)
 
-        self.crushmap.types = Types.create_set(['osd', 'host', 'psu', 'root'])
+        self.crushmap.types.create_set(['osd', 'host', 'psu', 'root'])
 
         self.crushmap.buckets = Buckets(self.crushmap)
 

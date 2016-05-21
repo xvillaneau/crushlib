@@ -2,7 +2,6 @@
 import unittest
 from crushsim.map import Map
 from crushsim.map.rules import Steps
-from crushsim.map.buckets import Buckets
 
 
 class TestBuckets(unittest.TestCase):

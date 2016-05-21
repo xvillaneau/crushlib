@@ -46,8 +46,10 @@ class Types():
             return False
         return True
 
-    @staticmethod
-    def create_set(type_list):
+    def create_set(self, type_list):
+
+        if self.list:
+            raise IndexError("This can only be done on an empty types list")
 
         if type(type_list) is not list:
             raise TypeError("Input must be a list of strings")
@@ -60,10 +62,8 @@ class Types():
         if len(type_list) != len(set(type_list)):
             raise ValueError("All elements in input must be unique")
 
-        types = Types()
         for t in type_list:
-            types.add(t, type_list.index(t))
-        return types
+            self.add(t, type_list.index(t))
 
 
 class Type():

@@ -112,7 +112,7 @@ class Buckets():
         self.crushmap.devices = Devices.create_bunch(osds)
 
         types_list = ['osd'] + [l['type'] for l in layers]
-        self.crushmap.types = Types.create_set(types_list)
+        self.crushmap.types.create_set(types_list)
 
         children = ['osd.{}'.format(i) for i in range(0, osds)]
 
