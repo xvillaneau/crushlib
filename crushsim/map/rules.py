@@ -61,11 +61,10 @@ class Rules():
 
 class Rule():
 
-    def __init__(self, crushmap, rule_name, rule_id=None, steps=None,
+    def __init__(self, rule_name, rule_id=None, steps=None,
                  rule_type='replicated', min_size=1, max_size=10):
 
         # Argument checking
-        utils.type_check(crushmap, Map, 'crushmap')
         utils.type_check(rule_name, str, 'rule_name')
         utils.type_check(rule_id, int, 'rule_id', True)
         utils.type_check(steps, Steps, 'steps', True)
@@ -74,7 +73,6 @@ class Rule():
         if rule_type not in ('replicated', 'erasure'):
             raise ValueError("Rule type must be replicated or erasure")
 
-        self.map = crushmap
         self.name = rule_name
         self.id = rule_id
         self.type = rule_type
@@ -104,6 +102,8 @@ class Steps():
             item = kwargs.get("item")
             assert item is not None
             return self.__add_take(item)
+        elif op == 'emit':
+            return self.__add_emit()
         raise ValueError()
 
     def __add_take(self, item):
@@ -117,3 +117,6 @@ class Steps():
         if not (isinstance(item, Device) or isinstance(item, Bucket)):
             raise TypeError("item must be a Device or a Bucket")
         self.__list.append({"op": "take", "item": item})
+
+    def __add_emit(self):
+        self.__list.append({"op": "emit"})

@@ -20,7 +20,13 @@ class TestBuckets(unittest.TestCase):
         self.crushmap = None
 
     def test_steps_addtake(self):
+        """Test adding a 'take' step"""
         steps = Steps(self.crushmap)
         steps.add('take', item='root')
         root = self.crushmap.get_item('root')
         steps.add('take', item=root)
+
+    def test_steps_addemit(self):
+        """Test adding an 'emit' step"""
+        steps = Steps(self.crushmap)
+        steps.add('emit')
