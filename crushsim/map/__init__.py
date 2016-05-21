@@ -13,7 +13,7 @@ class Map():
         self.tunables = Tunables()
         self.devices = Devices()
         self.types = Types()
-        self.buckets = Buckets(self.types, self.devices)
+        self.buckets = Buckets(self)
 
     def read_file(self, crush_filename):
         with open(crush_filename) as f:

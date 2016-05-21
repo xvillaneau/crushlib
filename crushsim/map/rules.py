@@ -6,11 +6,9 @@ from crushsim.map.devices import Device
 
 class Rules():
 
-    def __init__(self, buckets):
+    def __init__(self, crushmap):
         self.__list = []
-        self.types = buckets.types
-        self.devices = buckets.devices
-        self.buckets = buckets
+        self.map = crushmap
 
     def add(self, name, type_name, steps, min_size=1, max_size=10, id=None):
 

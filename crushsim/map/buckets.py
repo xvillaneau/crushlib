@@ -11,10 +11,9 @@ class Buckets():
     - devices: Devices object that keeps track of all devices in the map
     """
 
-    def __init__(self, types, devices):
+    def __init__(self, crushmap):
         """Buckets constructor."""
-        self.types = types
-        self.devices = devices
+        self.crushmap = crushmap
         self.__list = []
 
     def add_from_dict(self, data):
@@ -32,14 +31,14 @@ class Buckets():
         """
         name = data['name']
         type_name = data['type']
-        type_obj = self.types.get(name=type_name)
+        type_obj = self.crushmap.types.get(name=type_name)
         items = data.get('item', [])
         alg = data.get('alg', 'straw')
         hash_name = data.get('hash', 'rjenkins1')
 
         if self.exists(name):
             raise IndexError("Bucket {} already exists".format(name))
-        if self.devices.exists(name=name):
+        if self.crushmap.devices.exists(name=name):
             raise IndexError("{} already exists as a device".format(name))
 
         id = self.next_id()
@@ -48,11 +47,11 @@ class Buckets():
         for item in items:
             if not item.get('name'):
                 raise ValueError("All item must be identified with a name")
-            if self.devices.exists(name=item['name']):
+            if self.crushmap.devices.exists(name=item['name']):
                 if type(item.get('weight')) is not float:
                     raise ValueError('Buckets with devices as items must '
                                      'specify their weight as a float.')
-                obj = self.devices.get(name=item['name'])
+                obj = self.crushmap.devices.get(name=item['name'])
                 weight = item.get('weight')
             else:
                 obj = self.get(name=item['name'])
@@ -99,19 +98,26 @@ class Buckets():
         return True
 
     @staticmethod
-    def create_tree(osds, layers=[]):
+    def create_tree(crushmap, osds, layers=None):
         """Creates a tree of buckets, the same way `crushtool --build` does"""
-        devs = Devices.create_bunch(osds)
+
+        if layers is None:
+            layers = []
+
+        assert type(osds) is int
+        assert type(layers) is list
+
+        crushmap.devices = Devices.create_bunch(osds)
 
         types_list = ['osd'] + [l['type'] for l in layers]
-        types = Types.create_set(types_list)
+        crushmap.types = Types.create_set(types_list)
 
-        buckets = Buckets(types, devs)
+        buckets = Buckets(crushmap)
         children = ['osd.{}'.format(i) for i in range(0, osds)]
 
         def _gen_item(name):
             out = {'name': name}
-            if devs.exists(name=name):
+            if crushmap.devices.exists(name=name):
                 out['weight'] = 1.0
             return out
 
