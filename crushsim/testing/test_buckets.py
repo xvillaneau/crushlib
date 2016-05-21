@@ -86,6 +86,7 @@ class TestBuckets(unittest.TestCase):
     def test_createtree(self):
         """Test for Buckets.next_id()"""
         layers = [{'type': 'host', 'size': 4}, {'type': 'root'}]
-        b = Buckets.create_tree(self.crushmap, 15, layers)
-        self.assertEqual(len(b.get(name='root').items), 4)
-        self.assertEqual(len(b.get(name='host3').items), 3)
+        crushmap = Map()
+        crushmap.buckets.create_tree(15, layers)
+        self.assertEqual(len(crushmap.buckets.get(name='root').items), 4)
+        self.assertEqual(len(crushmap.buckets.get(name='host3').items), 3)

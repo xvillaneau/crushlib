@@ -97,8 +97,7 @@ class Buckets():
             return False
         return True
 
-    @staticmethod
-    def create_tree(crushmap, osds, layers=None):
+    def create_tree(self, osds, layers=None):
         """Creates a tree of buckets, the same way `crushtool --build` does"""
 
         if layers is None:
@@ -107,17 +106,19 @@ class Buckets():
         assert type(osds) is int
         assert type(layers) is list
 
-        crushmap.devices = Devices.create_bunch(osds)
+        if self.__list:
+            raise IndexError("This can only be done on an empty buckets list")
+
+        self.crushmap.devices = Devices.create_bunch(osds)
 
         types_list = ['osd'] + [l['type'] for l in layers]
-        crushmap.types = Types.create_set(types_list)
+        self.crushmap.types = Types.create_set(types_list)
 
-        buckets = Buckets(crushmap)
         children = ['osd.{}'.format(i) for i in range(0, osds)]
 
         def _gen_item(name):
             out = {'name': name}
-            if crushmap.devices.exists(name=name):
+            if self.crushmap.devices.exists(name=name):
                 out['weight'] = 1.0
             return out
 
@@ -131,7 +132,7 @@ class Buckets():
                 b_dict['name'] = ltype
                 b_dict['type'] = ltype
                 b_dict['item'] = map(_gen_item, children)
-                buckets.add_from_dict(b_dict)
+                self.add_from_dict(b_dict)
                 children = [ltype]
                 continue
 
@@ -143,11 +144,9 @@ class Buckets():
                 b_dict['name'] = '{}{}'.format(ltype, i)
                 b_dict['type'] = ltype
                 b_dict['item'] = map(_gen_item, sub_children)
-                buckets.add_from_dict(b_dict)
+                self.add_from_dict(b_dict)
                 next_children.append(b_dict['name'])
             children = next_children
-
-        return buckets
 
 
 class Bucket():
