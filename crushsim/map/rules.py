@@ -1,4 +1,7 @@
 
+from __future__ import absolute_import, division, \
+                       print_function, unicode_literals
+from crushsim import utils
 from crushsim.map import Map
 from crushsim.map.buckets import Bucket
 from crushsim.map.devices import Device
@@ -17,7 +20,8 @@ class Rules():
 
         if id is None:
             id = self.next_id()
-        if type(id) is not int or id < 0:
+        utils.type_check(id, int)
+        if id < 0:
             return ValueError("Expecting 'id' to be a positive integer")
         if self.exists(id=id):
             raise IndexError("Rule #{} already exists".format(id))
@@ -61,13 +65,14 @@ class Rule():
                  rule_type='replicated', min_size=1, max_size=10):
 
         # Argument checking
-        assert isinstance(crushmap, Map)
-        assert type(rule_name) is str
-        assert rule_id is None or (type(rule_id) is int and rule_id >= 0)
-        assert steps is None or isinstance(steps, Steps)
-        assert rule_type in ('replicated', 'erasure')
-        assert type(min_size) is int
-        assert type(max_size) is int
+        utils.type_check(crushmap, Map, 'crushmap')
+        utils.type_check(rule_name, str, 'rule_name')
+        utils.type_check(rule_id, int, 'rule_id', True)
+        utils.type_check(steps, Steps, 'steps', True)
+        utils.type_check(min_size, int, 'min_size')
+        utils.type_check(max_size, int, 'max_size')
+        if rule_type not in ('replicated', 'erasure'):
+            raise ValueError("Rule type must be replicated or erasure")
 
         self.map = crushmap
         self.name = rule_name
@@ -86,14 +91,14 @@ class Steps():
 
     def __init__(self, crushmap):
 
-        assert isinstance(crushmap, Map)
+        utils.type_check(crushmap, Map, 'crushmap')
 
         self.__list = []
         self.map = crushmap
 
     def add(self, op, **kwargs):
 
-        assert type(op) is str
+        utils.type_check(op, str, 'op')
 
         if op == 'take':
             item = kwargs.get("item")
@@ -103,7 +108,12 @@ class Steps():
 
     def __add_take(self, item):
 
-        if type(item) is str:
+        try:
+            utils.type_check(item, str)
             item = self.map.get_item(name=item)
-        assert isinstance(item, Device) or isinstance(item, Bucket)
+        except TypeError:
+            pass
+
+        if not (isinstance(item, Device) or isinstance(item, Bucket)):
+            raise TypeError("item must be a Device or a Bucket")
         self.__list.append({"op": "take", "item": item})

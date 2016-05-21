@@ -1,4 +1,9 @@
 
+from __future__ import absolute_import, division, \
+                       print_function, unicode_literals
+from crushsim import utils
+
+
 class Types():
 
     def __init__(self):
@@ -19,10 +24,8 @@ class Types():
         # Argument checking
         if not (id is None or name is None):
             raise ValueError("Only id or name can be searched at once")
-        if id is not None and type(id) is not int:
-            raise TypeError("Argument 'id' expected to be an integer")
-        if name is not None and type(name) not in (str, unicode):
-            raise TypeError("Argument 'name' expected to be a string")
+        utils.type_check(id, int, name='id', none=True)
+        utils.type_check(name, str, name='name', none=True)
         if name is not None and name == "":
             raise ValueError("Argument 'name' cannot be an empty string")
 
@@ -51,11 +54,9 @@ class Types():
         if self.list:
             raise IndexError("This can only be done on an empty types list")
 
-        if type(type_list) is not list:
-            raise TypeError("Input must be a list of strings")
+        utils.type_check(type_list, list)
         for t in type_list:
-            if type(t) not in (str, unicode):
-                raise TypeError("Input must be a list of strings")
+            utils.type_check(t, str, name='type')
 
         if not type_list:
             raise ValueError("Input cannot be an empty list")
@@ -69,10 +70,8 @@ class Types():
 class Type():
 
     def __init__(self, name, id):
-        if type(id) is not int:
-            raise TypeError("Argument 'id' expected to be an integer")
-        if type(name) not in (str, unicode):
-            raise TypeError("Argument 'name' expected to be a string")
+        utils.type_check(id, int, name='id')
+        utils.type_check(name, str, name='name')
         if name == '':
             raise ValueError("Argument 'name' cannot be an empty string")
 

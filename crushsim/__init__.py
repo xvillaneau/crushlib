@@ -1,6 +1,7 @@
 
-from __future__ import print_function
-import utils
+from __future__ import absolute_import, division, \
+                       print_function, unicode_literals
+from . import utils
 
 
 class CRUSHsim():

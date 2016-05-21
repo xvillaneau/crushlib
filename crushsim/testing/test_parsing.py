@@ -1,4 +1,6 @@
 
+from __future__ import absolute_import, division, \
+                       print_function, unicode_literals
 import unittest
 from crushsim.map import Map
 from crushsim.map.types import Type
