@@ -12,6 +12,12 @@ class Rules():
     def __init__(self):
         self.__list = []
 
+    def __str__(self):
+        out = ""
+        for rule in self.__list:
+            out += str(rule)
+        return out
+
     def add(self, rule):
 
         utils.type_check(rule, Rule, 'rule')
@@ -89,6 +95,16 @@ class Rule():
             steps.default()
         self.steps = steps
 
+    def __str__(self):
+        out = "rule {} {{\n".format(self.name)
+        out += "\truleset {}\n".format(self.id)
+        out += "\ttype {}\n".format(self.type)
+        out += "\tmin_size {}\n".format(self.min_size)
+        out += "\tmax_size {}\n".format(self.max_size)
+        out += str(self.steps)
+        out += '}\n'
+        return out
+
     @staticmethod
     def default(crushmap):
         root_item = crushmap.get_item(name='root')
@@ -104,6 +120,19 @@ class Steps():
 
     def __init__(self):
         self.__list = []
+
+    def __str__(self):
+        out = ""
+        for step in self.__list:
+            out += "\tstep {}".format(step["op"])
+
+            if step["op"] == "take":
+                out += " " + step["item"].name
+            elif step["op"] in ('choose', 'chooseleaf'):
+                out += " {} {} type {}".format(
+                    step["scheme"], step["num"], step["type"].name)
+            out += "\n"
+        return out
 
     def add(self, op, **kwargs):
 
@@ -129,7 +158,7 @@ class Steps():
             if scheme not in ('firstn', 'indep'):
                 raise TypeError('scheme should be firstn or indep')
 
-            self.__list.append({'op': op + '_' + scheme, 'num': num,
+            self.__list.append({'op': op, 'scheme': scheme, 'num': num,
                                 'type': type_obj})
         else:
             raise ValueError("Operation {} not recognized".format(op))

@@ -19,6 +19,20 @@ class Map():
         self.buckets = Buckets(self)
         self.rules = Rules()
 
+    def __str__(self):
+        out = "# begin crush map\n"
+        out += str(self.tunables)
+        out += "\n# devices\n"
+        out += str(self.devices)
+        out += "\n# types\n"
+        out += str(self.types)
+        out += "\n# buckets\n"
+        out += str(self.buckets)
+        out += "\n# rules\n"
+        out += str(self.rules)
+        out += "\n# end crush map\n"
+        return out
+
     def read_file(self, crush_filename):
         with open(crush_filename) as f:
             self.raw_map = f.read()
