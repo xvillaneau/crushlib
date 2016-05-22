@@ -8,6 +8,14 @@ class Devices():
     def __init__(self):
         self.__list = []
 
+    def __str__(self):
+        nums = [dev.id for dev in self.__list]
+        out = ""
+        for i in range(0, max(nums) + 1):
+            name = self.get(id=i).name if i in nums else 'device' + str(i)
+            out += 'device {} {}\n'.format(i, name)
+        return out
+
     def add(self, id=None):
 
         if id is None:

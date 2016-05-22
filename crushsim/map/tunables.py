@@ -23,7 +23,7 @@ class Tunables():
         for k in print_order:
             if self.settings.get(k) is not None:
                 out += 'tunable {} {}\n'.format(k, self.settings.get(k))
-        return out[:-1]
+        return out
 
     def update_setting(self, name, value):
         self.settings.setdefault(name, None)
