@@ -3,9 +3,9 @@ from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import unittest
 import crushsim
-from crushsim.map import Map
-from crushsim.map.types import Type
-from crushsim.map.buckets import Bucket
+from crushsim.crushmap import CRUSHmap
+from crushsim.crushmap.types import Type
+from crushsim.crushmap.buckets import Bucket
 
 import os
 FILES_DIR = os.path.join(os.path.dirname(__file__), 'files')
@@ -14,7 +14,7 @@ FILES_DIR = os.path.join(os.path.dirname(__file__), 'files')
 class TestGlobal(unittest.TestCase):
 
     def setUp(self):
-        self.crushmap = Map()
+        self.crushmap = CRUSHmap()
 
     def tearDown(self):
         self.crushmap = None

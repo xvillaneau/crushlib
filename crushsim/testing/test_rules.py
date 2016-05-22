@@ -2,14 +2,14 @@
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import unittest
-from crushsim.map import Map
-from crushsim.map.rules import Steps, Rule
+from crushsim.crushmap import CRUSHmap
+from crushsim.crushmap.rules import Steps, Rule
 
 
 class TestRules(unittest.TestCase):
 
     def setUp(self):
-        self.crushmap = Map()
+        self.crushmap = CRUSHmap()
 
         layers = [{'type': 'host', 'size': 4},
                   {'type': 'psu', 'size': 2},

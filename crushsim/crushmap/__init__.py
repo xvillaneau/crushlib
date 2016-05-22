@@ -10,7 +10,7 @@ from .buckets import Buckets
 from .rules import Rules
 
 
-class Map():
+class CRUSHmap():
 
     def __init__(self):
         self.tunables = Tunables()

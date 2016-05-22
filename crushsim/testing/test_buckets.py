@@ -2,14 +2,14 @@
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import unittest
-from crushsim.map import Map
-from crushsim.map.buckets import Bucket
+from crushsim.crushmap import CRUSHmap
+from crushsim.crushmap.buckets import Bucket
 
 
 class TestBuckets(unittest.TestCase):
 
     def setUp(self):
-        self.crushmap = Map()
+        self.crushmap = CRUSHmap()
         self.crushmap.devices.create_bunch(16)
         self.crushmap.types.create_set(['osd', 'host', 'psu', 'root'])
 
@@ -83,7 +83,7 @@ class TestBuckets(unittest.TestCase):
     def test_createtree(self):
         """Test for Buckets.next_id()"""
         layers = [{'type': 'host', 'size': 4}, {'type': 'root'}]
-        crushmap = Map()
+        crushmap = CRUSHmap()
         crushmap.buckets.create_tree(15, layers)
         self.assertEqual(len(crushmap.buckets.get(name='root').items), 4)
         self.assertEqual(len(crushmap.buckets.get(name='host3').items), 3)

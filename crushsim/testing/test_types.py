@@ -2,7 +2,7 @@
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import unittest
-from crushsim.map.types import Types, Type
+from crushsim.crushmap.types import Types, Type
 
 
 class TestTypes(unittest.TestCase):

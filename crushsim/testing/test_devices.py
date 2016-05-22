@@ -2,7 +2,7 @@
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import unittest
-from crushsim.map.devices import Devices
+from crushsim.crushmap.devices import Devices
 
 
 class TestDevices(unittest.TestCase):
