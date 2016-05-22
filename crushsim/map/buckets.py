@@ -17,6 +17,12 @@ class Buckets():
         self.crushmap = crushmap
         self.__list = []
 
+    def __str__(self):
+        out = ""
+        for b in self.__list:
+            out += str(b)
+        return out
+
     def add_from_dict(self, data):
         """Creates a new bucket from a dict.
         The dict is expected to have at least the following keys:
@@ -177,6 +183,28 @@ class Bucket():
         self.type.link_bucket(self)
 
     # TODO: Destroy handler that un-links bucket to the Type
+
+    def __str__(self):
+        if self.hash == "rjenkins1":
+            hash_id = 0
+        else:
+            raise ValueError("Unknown hash {}".format(self.hash))
+
+        out = '{} {} {{\n'.format(self.type.name, self.name)
+        out += '\tid {}\t\t# do not change unnecessarily\n'.format(self.id)
+        out += '\t# weight WIP\n'
+        out += '\talg {}\n'.format(self.alg)
+        out += '\thash {}\t# {}\n'.format(hash_id, self.hash)
+
+        for i in self.items:
+            if isinstance(i['obj'], Device):
+                weight = '{:.3f}'.format(i['weight'])
+            else:
+                weight = 'WIP'
+            out += '\titem {} weight {}\n'.format(i['obj'].name, weight)
+
+        out += '}\n'
+        return out
 
     def add_item(self, obj, weight=1.0):
         """Adds an item to the bucket, at the end of the list"""
