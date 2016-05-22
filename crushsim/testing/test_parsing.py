@@ -35,3 +35,9 @@ class TestParsing(unittest.TestCase):
         crushfile = os.path.join(FILES_DIR, 'crushmap_missingdev.txt')
         self.crushmap.read_file(crushfile)
         self.assertEqual(self.crushmap.devices.next_id(), 7)
+
+    def test_print_map(self):
+        """Test that maps are properly printed"""
+        crushfile = os.path.join(FILES_DIR, 'crushmap_missingdev.txt')
+        self.crushmap.read_file(crushfile)
+        self.assertEqual(self.crushmap.raw_map, str(self.crushmap))

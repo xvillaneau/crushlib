@@ -16,6 +16,7 @@ class Tunables():
             'choose_total_tries',
             'chooseleaf_descend_once',
             'chooseleaf_vary_r',
+            'straw_calc_version',
             'allowed_bucket_algs'
         ]
 

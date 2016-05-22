@@ -90,8 +90,8 @@ root root {
 	# weight 15.000
 	alg straw
 	hash 0	# rjenkins1
-	item psu0 weight 8.000
-	item psu1 weight 7.000
+	item psu0 weight 7.000
+	item psu1 weight 8.000
 }
 
 # rules
