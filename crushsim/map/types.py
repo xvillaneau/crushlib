@@ -7,7 +7,14 @@ from crushsim import utils
 class Types():
 
     def __init__(self):
-        self.list = []
+        self.__list = []
+
+    def __str__(self):
+        sort = sorted(self.__list, key=(lambda t: t.id))
+        out = ''
+        for t in sort:
+            out += 'type {} {}\n'.format(t.id, t.name)
+        return out
 
     def add(self, name, id):
 
@@ -17,7 +24,7 @@ class Types():
             raise IndexError("ID #{} is already taken".format(id))
 
         type_obj = Type(name, id)
-        self.list.append(type_obj)
+        self.__list.append(type_obj)
 
     def get(self, name=None, id=None):
 
@@ -31,11 +38,11 @@ class Types():
 
         # Processing the actual request
         if id is not None:
-            tmp = [t for t in self.list if t.id == id]
+            tmp = [t for t in self.__list if t.id == id]
         elif name is not None:
-            tmp = [t for t in self.list if t.name == name]
+            tmp = [t for t in self.__list if t.name == name]
         else:
-            return self.list
+            return self.__list
 
         if not tmp:
             raise IndexError("Could not find type with {}={}".format(
@@ -51,7 +58,7 @@ class Types():
 
     def create_set(self, type_list):
 
-        if self.list:
+        if self.__list:
             raise IndexError("This can only be done on an empty types list")
 
         utils.type_check(type_list, list)
