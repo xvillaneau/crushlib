@@ -192,16 +192,16 @@ class Bucket():
 
         out = '{} {} {{\n'.format(self.type.name, self.name)
         out += '\tid {}\t\t# do not change unnecessarily\n'.format(self.id)
-        out += '\t# weight WIP\n'
+        out += '\t# weight {:.3f}\n'.format(self.weight())
         out += '\talg {}\n'.format(self.alg)
         out += '\thash {}\t# {}\n'.format(hash_id, self.hash)
 
         for i in self.items:
             if isinstance(i['obj'], Device):
-                weight = '{:.3f}'.format(i['weight'])
+                weight = i['weight']
             else:
-                weight = 'WIP'
-            out += '\titem {} weight {}\n'.format(i['obj'].name, weight)
+                weight = i['obj'].weight()
+            out += '\titem {} weight {:.3f}\n'.format(i['obj'].name, weight)
 
         out += '}\n'
         return out
@@ -213,6 +213,25 @@ class Bucket():
             item['weight'] = weight
         obj.link_bucket(self)
         self.items.append(item)
+
+    def weight(self):
+        traversed = []
+        return self._weight_recursion(traversed)
+
+    def _weight_recursion(self, traversed):
+
+        if self.name in traversed:
+            raise ValueError("There is a loop in the bucket hierarchy!")
+        traversed.append(self.name)
+
+        weight = 0.0
+        for i in self.items:
+            obj = i['obj']
+            if isinstance(obj, Device):
+                weight += i['weight']
+            else:
+                weight += obj._weight_recursion(traversed)
+        return weight
 
     def link_bucket(self, bucket):
         """Used when a parent bucket declares this bucket as item"""
