@@ -5,6 +5,7 @@ from crushsim import utils
 from crushsim.map import Map
 from crushsim.map.buckets import Bucket
 from crushsim.map.devices import Device
+from crushsim.map.types import Type
 
 
 class Rules():
@@ -100,23 +101,25 @@ class Steps():
 
         if op == 'take':
             item = kwargs.get("item")
-            assert item is not None
-            return self.__add_take(item)
+            if not (isinstance(item, Device) or isinstance(item, Bucket)):
+                raise TypeError("item must be a Device or a Bucket")
+            self.__list.append({"op": "take", "item": item})
+
         elif op == 'emit':
-            return self.__add_emit()
-        raise ValueError()
+            self.__list.append({"op": "emit"})
 
-    def __add_take(self, item):
+        elif op in ('choose', 'chooseleaf'):
+            num = kwargs.get('num')
+            utils.type_check(num, int, 'num')
 
-        try:
-            utils.type_check(item, str)
-            item = self.map.get_item(name=item)
-        except TypeError:
-            pass
+            type_obj = kwargs.get('type')
+            utils.type_check(type_obj, Type, 'type')
 
-        if not (isinstance(item, Device) or isinstance(item, Bucket)):
-            raise TypeError("item must be a Device or a Bucket")
-        self.__list.append({"op": "take", "item": item})
+            scheme = kwargs.get('scheme')
+            if scheme not in ('firstn', 'indep'):
+                raise TypeError('scheme should be firstn or indep')
 
-    def __add_emit(self):
-        self.__list.append({"op": "emit"})
+            self.__list.append({'op': op + '_' + scheme, 'num': num,
+                                'type': type_obj})
+        else:
+            raise ValueError("Operation {} not recognized".format(op))
