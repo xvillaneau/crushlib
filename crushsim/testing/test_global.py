@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import unittest
+import crushsim
 from crushsim.map import Map
 from crushsim.map.types import Type
 from crushsim.map.buckets import Bucket
@@ -10,13 +11,17 @@ import os
 FILES_DIR = os.path.join(os.path.dirname(__file__), 'files')
 
 
-class TestParsing(unittest.TestCase):
+class TestGlobal(unittest.TestCase):
 
     def setUp(self):
         self.crushmap = Map()
 
     def tearDown(self):
         self.crushmap = None
+
+    def test_crushsim_init(self):
+        cs = crushsim.CRUSHsim()
+        self.assertTrue(cs.config.has_option('crushsim', 'crushtool_path'))
 
     def test_base_import(self):
         """Basic import success path for a simple map"""

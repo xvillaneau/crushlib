@@ -4,6 +4,12 @@
 # Packaging
 /*.egg-info
 /.eggs
+/*.egg
+
+# Testing
+/.coverage
+/tests-*.txt
+/coverage-*.txt
 
 # Vagrant
 /.vagrant
