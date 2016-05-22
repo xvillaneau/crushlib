@@ -7,6 +7,7 @@ from .tunables import Tunables
 from .devices import Devices
 from .types import Types
 from .buckets import Buckets
+from .rules import Rules
 
 
 class Map():
@@ -16,6 +17,7 @@ class Map():
         self.devices = Devices()
         self.types = Types()
         self.buckets = Buckets(self)
+        self.rules = Rules()
 
     def read_file(self, crush_filename):
         with open(crush_filename) as f:

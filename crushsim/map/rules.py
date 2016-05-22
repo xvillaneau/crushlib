@@ -2,7 +2,6 @@
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 from crushsim import utils
-from crushsim.map import Map
 from crushsim.map.buckets import Bucket
 from crushsim.map.devices import Device
 from crushsim.map.types import Type
@@ -10,22 +9,27 @@ from crushsim.map.types import Type
 
 class Rules():
 
-    def __init__(self, crushmap):
+    def __init__(self):
         self.__list = []
-        self.map = crushmap
 
-    def add(self, name, type_name, steps, min_size=1, max_size=10, id=None):
+    def add(self, rule):
 
-        if self.exists(name=name):
-            raise IndexError("Rule {} already exists".format(name))
+        utils.type_check(rule, Rule, 'rule')
 
-        if id is None:
-            id = self.next_id()
-        utils.type_check(id, int)
-        if id < 0:
+        rule_id = rule.id
+        if rule_id is None:
+            rule_id = self.next_id()
+
+        if rule_id < 0:
             return ValueError("Expecting 'id' to be a positive integer")
-        if self.exists(id=id):
-            raise IndexError("Rule #{} already exists".format(id))
+        if self.exists(id=rule_id):
+            raise IndexError("Rule #{} already exists".format(rule_id))
+        if self.exists(name=rule.name):
+            raise IndexError("Rule {} already exists".format(rule.name))
+
+        # All tests passed, now adding the rule with its assigned id
+        rule.id = rule_id
+        self.__list.append(rule)
 
     def get(self, name=None, id=None):
 
@@ -62,12 +66,12 @@ class Rules():
 
 class Rule():
 
-    def __init__(self, rule_name, rule_id=None, steps=None,
+    def __init__(self, rule_name, ruleset=None, steps=None,
                  rule_type='replicated', min_size=1, max_size=10):
 
         # Argument checking
         utils.type_check(rule_name, str, 'rule_name')
-        utils.type_check(rule_id, int, 'rule_id', True)
+        utils.type_check(ruleset, int, 'ruleset', True)
         utils.type_check(steps, Steps, 'steps', True)
         utils.type_check(min_size, int, 'min_size')
         utils.type_check(max_size, int, 'max_size')
@@ -75,25 +79,31 @@ class Rule():
             raise ValueError("Rule type must be replicated or erasure")
 
         self.name = rule_name
-        self.id = rule_id
         self.type = rule_type
         self.min_size = min_size
         self.max_size = max_size
+        self.id = ruleset
 
         if steps is None:
             steps = Steps(self.map)
             steps.default()
         self.steps = steps
 
+    @staticmethod
+    def default(crushmap):
+        root_item = crushmap.get_item(name='root')
+        host_type = crushmap.types.get(name='host')
+        steps = Steps()
+        steps.add('take', item=root_item)
+        steps.add('chooseleaf', type=host_type)
+        steps.add('emit')
+        return Rule('replicated_ruleset', steps=steps)
+
 
 class Steps():
 
-    def __init__(self, crushmap):
-
-        utils.type_check(crushmap, Map, 'crushmap')
-
+    def __init__(self):
         self.__list = []
-        self.map = crushmap
 
     def add(self, op, **kwargs):
 
@@ -109,13 +119,13 @@ class Steps():
             self.__list.append({"op": "emit"})
 
         elif op in ('choose', 'chooseleaf'):
-            num = kwargs.get('num')
+            num = kwargs.get('num', 0)
             utils.type_check(num, int, 'num')
 
             type_obj = kwargs.get('type')
             utils.type_check(type_obj, Type, 'type')
 
-            scheme = kwargs.get('scheme')
+            scheme = kwargs.get('scheme', 'firstn')
             if scheme not in ('firstn', 'indep'):
                 raise TypeError('scheme should be firstn or indep')
 
