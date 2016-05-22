@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import re
+from crushsim.map.rules import Rule, Steps
 
 
 def parse_raw(crushmap, map_obj):
@@ -10,6 +11,7 @@ def parse_raw(crushmap, map_obj):
     parse_devices(map_obj, parsed['device'])
     parse_types(map_obj, parsed['type'])
     parse_buckets(map_obj, parsed['bucket'])
+    parse_rules(map_obj, parsed['rule'])
 
 
 def _raw_to_dict(raw_str):
@@ -137,3 +139,44 @@ def parse_buckets(map_obj, buckets_list):
 
     for bucket_raw in buckets_list:
         map_obj.buckets.add_from_dict(parse_bucket(bucket_raw))
+
+
+def parse_rules(map_obj, rules_list):
+    for rule_list in rules_list:
+        steps = Steps()
+
+        for line in rule_list:
+            l = line.split()
+            head = l[0]
+            value = l[1]
+
+            if head == 'rule':
+                name = value
+            elif head == 'ruleset':
+                ruleset = int(value)
+            elif head == 'type':
+                rule_type = value
+            elif head == 'min_size':
+                min_size = int(value)
+            elif head == 'max_size':
+                max_size = int(value)
+            elif head == 'step':
+                op = value
+                if op == 'take':
+                    item = map_obj.get_item(name=l[2])
+                    steps.add(op, item=item)
+                elif op in ('choose', 'chooseleaf'):
+                    scheme = l[2]
+                    num = int(l[3])
+                    type_obj = map_obj.types.get(name=l[5])
+                    steps.add(op, scheme=scheme, num=num, type=type_obj)
+                elif op == 'emit':
+                    steps.add(op)
+                else:
+                    raise ValueError("Unknown operation {}".format(op))
+            else:
+                raise ValueError("Unknown key {}".format(head))
+
+        rule = Rule(name, ruleset=ruleset, rule_type=rule_type,
+                    steps=steps, min_size=min_size, max_size=max_size)
+        map_obj.rules.add(rule)

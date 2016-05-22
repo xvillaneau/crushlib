@@ -23,10 +23,15 @@ class TestTypes(unittest.TestCase):
         self.types.add("host", 0)
         self.types.add("root", 3)
         self.assertIsInstance(self.types.get(id=0), Type)
-        self.assertDictContainsSubset({'name': 'host', 'id': 0},
-                                      self.types.get(id=0).__dict__)
-        self.assertDictContainsSubset({'name': 'host', 'id': 0},
-                                      self.types.get(name='host').__dict__)
+
+        host = self.types.get(id=0)
+        self.assertEqual(host.id, 0)
+        self.assertEqual(host.name, 'host')
+
+        host = self.types.get(name='host')
+        self.assertEqual(host.id, 0)
+        self.assertEqual(host.name, 'host')
+
         self.assertIn(self.types.get(id=3), self.types.get())
 
     def test_exists(self):
@@ -40,12 +45,19 @@ class TestTypes(unittest.TestCase):
     def test_createset(self):
         """Test success path for Types.create_set()"""
         self.types.create_set(['osd', 'host', 'root'])
-        self.assertDictContainsSubset({'id': 0, 'name': 'osd'},
-                                      self.types.get(name='osd').__dict__)
-        self.assertDictContainsSubset({'id': 1, 'name': 'host'},
-                                      self.types.get(name='host').__dict__)
-        self.assertDictContainsSubset({'id': 2, 'name': 'root'},
-                                      self.types.get(name='root').__dict__)
+
+        t = self.types.get(name='osd')
+        self.assertEqual(t.id, 0)
+        self.assertEqual(t.name, 'osd')
+
+        t = self.types.get(name='host')
+        self.assertEqual(t.id, 1)
+        self.assertEqual(t.name, 'host')
+
+        t = self.types.get(name='root')
+        self.assertEqual(t.id, 2)
+        self.assertEqual(t.name, 'root')
+
         self.assertEqual(len(self.types.get()), 3)
 
     def test_add_except(self):
