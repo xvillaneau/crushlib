@@ -1,8 +1,11 @@
 
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
+
 import math
+from crushlib import utils
 from crushlib.crushmap.devices import Device
+from crushlib.crushmap.types import Type
 
 
 class Buckets():
@@ -49,7 +52,7 @@ class Buckets():
             raise IndexError("{} already exists as a device".format(name))
 
         id = self.next_id()
-        bucket = Bucket(name, id, type_obj, alg, hash_name)
+        bucket = Bucket(name, type_obj, id, alg, hash_name)
 
         for item in items:
             if not item.get('name'):
@@ -65,6 +68,23 @@ class Buckets():
                 weight = 0.0
             bucket.add_item(obj, weight)
 
+        self.__list.append(bucket)
+
+    def add(self, bucket):
+        """Add a bucket object to the set.
+        Its ID will be given if not set already."""
+        utils.type_check(bucket, Bucket, 'bucket')
+
+        bucket_id = bucket.id
+        if bucket_id is None:
+            bucket_id = self.next_id()
+
+        if self.exists(id=bucket_id):
+            raise IndexError("Bucket #{} already exists".format(bucket_id))
+        if self.exists(name=bucket.name):
+            raise IndexError("Bucket {} already exists".format(bucket.name))
+
+        bucket.id = bucket_id
         self.__list.append(bucket)
 
     def next_id(self):
@@ -96,10 +116,10 @@ class Buckets():
                 'name' if name else 'id', name if name else id))
         return tmp[0]
 
-    def exists(self, name):
+    def exists(self, name=None, id=None):
         """Check if a bucket of a given name exists"""
         try:
-            self.get(name=name)
+            self.get(name=name, id=id)
         except IndexError:
             return False
         return True
@@ -110,8 +130,8 @@ class Buckets():
         if layers is None:
             layers = []
 
-        assert type(osds) is int
-        assert type(layers) is list
+        utils.type_check(osds, int, 'osds')
+        utils.type_check(layers, list, 'layers')
 
         if self.__list:
             raise IndexError("This can only be done on an empty buckets list")
@@ -167,16 +187,28 @@ class Bucket():
     - hash_name: Name of the hash to use (default: rjenkins1)
     """
 
-    def __init__(self, name, id, type_obj, alg='straw', hash_name='rjenkins1'):
+    def __init__(self, name, type_obj, id=None, alg='straw', hash='rjenkins1'):
 
-        if type(id) is not int or id >= 0:
-            raise ValueError('Expection id to be a negative integer')
+        utils.type_check(name, str, 'name')
+        utils.type_check(type_obj, Type, 'type_obj')
+
+        utils.type_check(id, int, 'id', True)
+        if id is not None and id >= 0:
+            raise ValueError('Expecting id to be a negative integer')
+
+        utils.type_check(alg, str, 'alg')
+        if alg not in ('uniform', 'list', 'tree', 'straw'):
+            raise ValueError("{} is not a valid algorithm".format(alg))
+
+        utils.type_check(hash, str, 'hash')
+        if hash not in ('rjenkins1',):
+            raise ValueError("{} is not a valid hash".format(hash))
 
         self.name = name
         self.id = id
         self.type = type_obj
         self.alg = alg
-        self.hash = hash_name
+        self.hash = hash
         self.items = []
         self.is_item_of = []
 
@@ -208,17 +240,25 @@ class Bucket():
 
     def add_item(self, obj, weight=1.0):
         """Adds an item to the bucket, at the end of the list"""
+        utils.type_check(weight, float, 'weight')
+
         item = {'obj': obj}
         if isinstance(obj, Device):
             item['weight'] = weight
+        elif not isinstance(obj, Bucket):
+            raise TypeError("item must be a Bucket or a Device")
         obj.link_bucket(self)
+
         self.items.append(item)
 
     def weight(self):
+        """Returns the total weight of the bucket, all items summed up"""
         traversed = []
         return self._weight_recursion(traversed)
 
     def _weight_recursion(self, traversed):
+        """Recursive function for computing weight.
+        Includes test for loops."""
 
         if self.name in traversed:
             raise ValueError("There is a loop in the bucket hierarchy!")

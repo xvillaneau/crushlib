@@ -106,9 +106,7 @@ class Rule():
         return out
 
     @staticmethod
-    def default(crushmap):
-        root_item = crushmap.get_item(name='root')
-        host_type = crushmap.types.get(name='host')
+    def default(root_item, host_type):
         steps = Steps()
         steps.add('take', item=root_item)
         steps.add('chooseleaf', type=host_type)

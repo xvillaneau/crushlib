@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import unittest
+
 from crushlib.crushmap import CRUSHmap
 from crushlib.crushmap.rules import Steps, Rule
 
@@ -9,22 +10,25 @@ from crushlib.crushmap.rules import Steps, Rule
 class TestRules(unittest.TestCase):
 
     def setUp(self):
-        self.crushmap = CRUSHmap()
-
         layers = [{'type': 'host', 'size': 4},
                   {'type': 'psu', 'size': 2},
                   {'type': 'root'}]
-        self.crushmap.buckets.create_tree(16, layers)
+        self.crushmap = CRUSHmap.create(16, layers)
 
     def tearDown(self):
         self.crushmap = None
 
     def test_rules_add(self):
-        r = Rule.default(self.crushmap)
+        root_item = self.crushmap.get_item(name='root')
+        host_type = self.crushmap.types.get(name='host')
+        r = Rule.default(root_item, host_type)
+        r.name = 'test_rule'
         self.crushmap.rules.add(r)
 
     def test_rule_default(self):
-        r = Rule.default(self.crushmap)
+        root_item = self.crushmap.get_item(name='root')
+        host_type = self.crushmap.types.get(name='host')
+        r = Rule.default(root_item, host_type)
         self.assertIsInstance(r, Rule)
         self.assertEqual(r.name, 'replicated_ruleset')
         self.assertEqual(r.type, 'replicated')
