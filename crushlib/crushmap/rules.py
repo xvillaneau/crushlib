@@ -1,10 +1,10 @@
 
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
-from crushsim import utils
-from crushsim.crushmap.buckets import Bucket
-from crushsim.crushmap.devices import Device
-from crushsim.crushmap.types import Type
+from crushlib import utils
+from crushlib.crushmap.buckets import Bucket
+from crushlib.crushmap.devices import Device
+from crushlib.crushmap.types import Type
 
 
 class Rules():

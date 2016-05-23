@@ -15,9 +15,9 @@ touch $LOCK_FILE
 
 cd  /vagrant
 py3ver=$(python3 --version 2>&1 | awk '{print $2}')
-python3-coverage run --source crushsim setup.py test &> tests-$py3ver.txt
+python3-coverage run --source crushlib setup.py test &> tests-$py3ver.txt
 python3-coverage report -m &> coverage-$py3ver.txt
 
 py2ver=$(python2 --version 2>&1 | awk '{print $2}')
-python2-coverage run --source crushsim setup.py test &> tests-$py2ver.txt
+python2-coverage run --source crushlib setup.py test &> tests-$py2ver.txt
 python2-coverage report -m &> coverage-$py2ver.txt

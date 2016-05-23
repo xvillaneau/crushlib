@@ -12,7 +12,7 @@ def load_config(cfg_file=None):
     parser = configparser.ConfigParser()
 
     default_cfg = os.path.join(os.path.dirname(__file__), 'default.cfg')
-    cfg_locs = [default_cfg, '/etc/crushsim.cfg', '/etc/opt/crushsim.cfg']
+    cfg_locs = [default_cfg, '/etc/crushlib.cfg', '/etc/opt/crushlib.cfg']
     if cfg_file:
         cfg_locs.append(cfg_file)
     parser.read(cfg_locs)
@@ -23,11 +23,11 @@ def load_config(cfg_file=None):
 
 
 def check_crushtool(config):
-    cpath = config.get('crushsim', 'crushtool_path')
+    cpath = config.get('crushlib', 'crushtool_path')
     if not os.path.isfile(cpath):
         raise IOError("Can't find crushtool in {}.".format(cpath))
     if not os.access(cpath, os.X_OK):
-        raise IOError("crushtool exists but CRUSHsim is not allowed "
+        raise IOError("crushtool exists but CRUSHlib is not allowed "
                       "to run it.")
 
 

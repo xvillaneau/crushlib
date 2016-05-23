@@ -2,7 +2,7 @@
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import re
-from crushsim.crushmap.rules import Rule, Steps
+from crushlib.crushmap.rules import Rule, Steps
 
 
 def parse_raw(crushmap, map_obj):

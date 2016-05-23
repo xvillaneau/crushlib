@@ -2,10 +2,10 @@
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import unittest
-import crushsim
-from crushsim.crushmap import CRUSHmap
-from crushsim.crushmap.types import Type
-from crushsim.crushmap.buckets import Bucket
+import crushlib
+from crushlib.crushmap import CRUSHmap
+from crushlib.crushmap.types import Type
+from crushlib.crushmap.buckets import Bucket
 
 import os
 FILES_DIR = os.path.join(os.path.dirname(__file__), 'files')
@@ -19,9 +19,9 @@ class TestGlobal(unittest.TestCase):
     def tearDown(self):
         self.crushmap = None
 
-    def test_crushsim_init(self):
-        cs = crushsim.CRUSHsim()
-        self.assertTrue(cs.config.has_option('crushsim', 'crushtool_path'))
+    def test_crushlib_init(self):
+        cs = crushlib.CRUSHlib()
+        self.assertTrue(cs.config.has_option('crushlib', 'crushtool_path'))
 
     def test_base_import(self):
         """Basic import success path for a simple map"""

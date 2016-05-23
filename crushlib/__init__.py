@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, \
 from . import utils
 
 
-class CRUSHsim():
+class CRUSHlib():
 
     def __init__(self, cfg_file=None):
         self.config = utils.load_config(cfg_file=cfg_file)
