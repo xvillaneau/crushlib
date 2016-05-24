@@ -2,7 +2,6 @@
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 
-import math
 from crushlib import utils
 from crushlib.crushmap.devices import Device
 from crushlib.crushmap.types import Type
@@ -15,9 +14,8 @@ class Buckets():
     - devices: Devices object that keeps track of all devices in the map
     """
 
-    def __init__(self, crushmap):
+    def __init__(self):
         """Buckets constructor."""
-        self.crushmap = crushmap
         self.__list = []
 
     def __str__(self):
@@ -25,50 +23,6 @@ class Buckets():
         for b in self.__list:
             out += str(b)
         return out
-
-    def add_from_dict(self, data):
-        """Creates a new bucket from a dict.
-        The dict is expected to have at least the following keys:
-        - name: Name of the bucket (unique)
-        - type: Name of the type this bucket will be of
-        Optional keys are:
-        - alg: Algorithm to use for CRUSH (default: straw)
-        - hash: Hash to use (default: rjenkins1)
-        - item: list of items to put into the bucket (default: [])
-        Items are expected to be dicts with the followinf keys:
-        - name: name of an existing bucket or device
-        - weight: float value for weight, only if the item is a device
-        """
-        name = data['name']
-        type_name = data['type']
-        type_obj = self.crushmap.types.get(name=type_name)
-        items = data.get('item', [])
-        alg = data.get('alg', 'straw')
-        hash_name = data.get('hash', 'rjenkins1')
-
-        if self.exists(name):
-            raise IndexError("Bucket {} already exists".format(name))
-        if self.crushmap.devices.exists(name=name):
-            raise IndexError("{} already exists as a device".format(name))
-
-        id = self.next_id()
-        bucket = Bucket(name, type_obj, id, alg, hash_name)
-
-        for item in items:
-            if not item.get('name'):
-                raise ValueError("All item must be identified with a name")
-            if self.crushmap.devices.exists(name=item['name']):
-                if type(item.get('weight')) is not float:
-                    raise ValueError('Buckets with devices as items must '
-                                     'specify their weight as a float.')
-                obj = self.crushmap.devices.get(name=item['name'])
-                weight = item.get('weight')
-            else:
-                obj = self.get(name=item['name'])
-                weight = 0.0
-            bucket.add_item(obj, weight)
-
-        self.__list.append(bucket)
 
     def add(self, bucket):
         """Add a bucket object to the set.
@@ -123,57 +77,6 @@ class Buckets():
         except IndexError:
             return False
         return True
-
-    def create_tree(self, osds, layers=None):
-        """Creates a tree of buckets, the same way `crushtool --build` does"""
-
-        if layers is None:
-            layers = []
-
-        utils.type_check(osds, int, 'osds')
-        utils.type_check(layers, list, 'layers')
-
-        if self.__list:
-            raise IndexError("This can only be done on an empty buckets list")
-
-        self.crushmap.devices.create_bunch(osds)
-
-        types_list = ['osd'] + [l['type'] for l in layers]
-        self.crushmap.types.create_set(types_list)
-
-        children = ['osd.{}'.format(i) for i in range(0, osds)]
-
-        def _gen_item(name):
-            out = {'name': name}
-            if self.crushmap.devices.exists(name=name):
-                out['weight'] = 1.0
-            return out
-
-        for layer in layers:
-            b_dict = {}
-            b_dict['alg'] = layer.get('alg', 'straw')
-            size = layer.get('size', 0)
-            ltype = layer['type']
-
-            if size == 0:
-                b_dict['name'] = ltype
-                b_dict['type'] = ltype
-                b_dict['item'] = map(_gen_item, children)
-                self.add_from_dict(b_dict)
-                children = [ltype]
-                continue
-
-            # If size > 0
-            next_children = []
-            num_items = int(math.ceil(float(len(children)) / size))
-            for i in range(0, num_items):
-                sub_children = children[(i * size):((i+1) * size)]
-                b_dict['name'] = '{}{}'.format(ltype, i)
-                b_dict['type'] = ltype
-                b_dict['item'] = map(_gen_item, sub_children)
-                self.add_from_dict(b_dict)
-                next_children.append(b_dict['name'])
-            children = next_children
 
 
 class Bucket():

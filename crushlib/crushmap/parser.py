@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import re
 from crushlib.crushmap.rules import Rule, Steps
+from crushlib.crushmap.buckets import Bucket
 
 
 def parse_raw(crushmap, map_obj):
@@ -109,36 +110,40 @@ def parse_types(map_obj, types_list):
         map_obj.types.add(name, id)
 
 
-def parse_buckets(map_obj, buckets_list):
+def parse_buckets(crushmap, buckets_list):
 
     def parse_bucket(bucket_raw):
-        out = {'item': []}
+        items = []
         for string in bucket_raw:
             line = string.split()
             head = line[0]
             value = line[1]
 
             if line[-1] == '{':  # First line: open bucket declaration
-                out['type'] = head
-                out['name'] = value
+                type_obj = crushmap.types.get(name=head)
+                name = value
             elif head == 'item':
-                item = {'name': value, 'weight': float(line[3])}
-                out['item'].append(item)
+                item = (crushmap.get_item(name=value), float(line[3]))
+                items.append(item)
             elif head == 'id':
-                out['id'] = int(value)
+                id = int(value)
             elif head == 'alg':
-                out['alg'] = value
+                alg = value
             elif head == 'hash':
                 if value == '0':
-                    out['hash'] = 'rjenkins1'
+                    hash = 'rjenkins1'
                 else:
                     raise ValueError("Unknown hash {}".format(value))
             else:
                 raise ValueError("Unknown property {}".format(head))
-        return out
+
+        bucket = Bucket(name, type_obj, id, alg, hash)
+        for i in items:
+            bucket.add_item(i[0], i[1])
+        return bucket
 
     for bucket_raw in buckets_list:
-        map_obj.buckets.add_from_dict(parse_bucket(bucket_raw))
+        crushmap.buckets.add(parse_bucket(bucket_raw))
 
 
 def parse_rules(map_obj, rules_list):

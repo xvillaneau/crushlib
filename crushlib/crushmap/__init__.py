@@ -18,7 +18,7 @@ class CRUSHmap():
         self.tunables = Tunables()
         self.devices = Devices()
         self.types = Types()
-        self.buckets = Buckets(self)
+        self.buckets = Buckets()
         self.rules = Rules()
 
     def __str__(self):
