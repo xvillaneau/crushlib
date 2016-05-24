@@ -2,6 +2,8 @@
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 
+from crushlib import utils
+
 
 class Devices():
 
@@ -18,6 +20,7 @@ class Devices():
 
     def add(self, id=None):
 
+        utils.type_check(id, int, 'id', True)
         if id is None:
             id = self.next_id()
         if self.exists(id=id):
@@ -64,9 +67,10 @@ class Devices():
 
     def create_bunch(self, num):
 
+        utils.type_check(num, int, 'num')
         if self.__list:
             raise IndexError("Can only be done on an empty Devices list")
-        if type(num) is not int or num < 1:
+        if num < 1:
             raise ValueError(
                 "Expecting num to be a strictly positive integer")
 
