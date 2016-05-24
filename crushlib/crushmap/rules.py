@@ -27,7 +27,7 @@ class Rules():
             rule_id = self.next_id()
 
         if rule_id < 0:
-            return ValueError("Expecting 'id' to be a positive integer")
+            raise ValueError("Expecting 'id' to be a positive integer")
         if self.exists(id=rule_id):
             raise IndexError("Rule #{} already exists".format(rule_id))
         if self.exists(name=rule.name):
@@ -91,8 +91,7 @@ class Rule():
         self.id = ruleset
 
         if steps is None:
-            steps = Steps(self.map)
-            steps.default()
+            steps = Steps()
         self.steps = steps
 
     def __str__(self):
@@ -154,7 +153,7 @@ class Steps():
 
             scheme = kwargs.get('scheme', 'firstn')
             if scheme not in ('firstn', 'indep'):
-                raise TypeError('scheme should be firstn or indep')
+                raise ValueError('scheme should be firstn or indep')
 
             self.__list.append({'op': op, 'scheme': scheme, 'num': num,
                                 'type': type_obj})
