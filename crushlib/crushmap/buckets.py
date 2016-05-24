@@ -122,8 +122,6 @@ class Bucket():
     def __str__(self):
         if self.hash == "rjenkins1":
             hash_id = 0
-        else:
-            raise ValueError("Unknown hash {}".format(self.hash))
 
         out = '{} {} {{\n'.format(self.type.name, self.name)
         out += '\tid {}\t\t# do not change unnecessarily\n'.format(self.id)
