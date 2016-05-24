@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, \
 import os
 try:
     import ConfigParser as configparser
-except ImportError:
+except ImportError:  # pragma: no cover
     import configparser
 
 
@@ -37,7 +37,7 @@ def type_check(test_obj, test_type, name='', none=False):
     if test_type is str:
         try:
             test_type = basestring
-        except NameError:
+        except NameError:  # pragma: no cover
             test_type = str
 
     if none and test_obj is None:

@@ -60,6 +60,11 @@ class TestTypes(unittest.TestCase):
 
         self.assertEqual(len(self.types.get()), 3)
 
+    def test_type_init(self):
+        Type('test', 0)
+        with self.assertRaises(ValueError):
+            Type('', 0)
+
     def test_add_except(self):
         """Test exceptions returned by Types.add()"""
         with self.assertRaises(TypeError):
@@ -107,3 +112,7 @@ class TestTypes(unittest.TestCase):
             self.types.create_set([])
         with self.assertRaises(ValueError):
             self.types.create_set(['osd', 'osd', 'host'])
+
+        self.types.create_set(['osd', 'host', 'root'])
+        with self.assertRaises(IndexError):
+            self.types.create_set([])
