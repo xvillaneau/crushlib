@@ -22,7 +22,7 @@ def load_config(cfg_file=None):
     return parser
 
 
-def check_crushtool(config):
+def check_crushtool(config):  # pragma: no cover
     cpath = config.get('crushlib', 'crushtool_path')
     if not os.path.isfile(cpath):
         raise IOError("Can't find crushtool in {}.".format(cpath))

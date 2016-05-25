@@ -35,14 +35,14 @@ class Tunables():
 
         if profile in ('legacy', 'argonaut'):
             self.settings = {}
-        if profile == 'bobtail':
+        elif profile == 'bobtail':
             self.settings = {
                 'choose_local_tries': 0,
                 'choose_local_fallback_tries': 0,
                 'choose_total_tries': 50,
                 'chooseleaf_descend_once': 1
             }
-        if profile == 'firefly':
+        elif profile == 'firefly':
             self.settings = {
                 'choose_local_tries': 0,
                 'choose_local_fallback_tries': 0,
@@ -50,7 +50,7 @@ class Tunables():
                 'chooseleaf_descend_once': 1,
                 'chooseleaf_vary_r': 1
             }
-        if profile == 'hammer':
+        elif profile == 'hammer':
             self.settings = {
                 'choose_local_tries': 0,
                 'choose_local_fallback_tries': 0,

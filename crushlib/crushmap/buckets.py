@@ -120,8 +120,7 @@ class Bucket():
     # TODO: Destroy handler that un-links bucket to the Type
 
     def __str__(self):
-        if self.hash == "rjenkins1":
-            hash_id = 0
+        hash_id = 0  # There is no other possibiloty anyway
 
         out = '{} {} {{\n'.format(self.type.name, self.name)
         out += '\tid {}\t\t# do not change unnecessarily\n'.format(self.id)
