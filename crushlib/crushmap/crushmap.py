@@ -37,14 +37,14 @@ class CrushMap(object):
             self.raw_map = f.read()
         parse_raw(self.raw_map, self)
 
-    def get_item(self, name=None, id=None):
+    def get_item(self, name=None, item_id=None):
         item = None
         try:
-            item = self.devices.get(name=name, id=id)
+            item = self.devices.get_device(name=name, dev_id=item_id)
         except IndexError:
             pass
         try:
-            item = self.buckets.get(name=name, id=id)
+            item = self.buckets.get_bucket(name=name, bucket_id=item_id)
         except IndexError:
             pass
         if item is None:
@@ -78,7 +78,7 @@ class CrushMap(object):
         types_list = ['osd'] + [l['type'] for l in layers]
         crushmap.types.create_set(types_list)
 
-        children = crushmap.devices.get()
+        children = crushmap.devices.get_device()
 
         # Generate the buckets. This is the complex part
         for layer in layers:
@@ -93,7 +93,7 @@ class CrushMap(object):
                 for child in children:
                     bucket.add_item(child)
 
-                crushmap.buckets.add(bucket)
+                crushmap.buckets.add_bucket(bucket)
                 children = [bucket]
                 continue
 
@@ -109,13 +109,13 @@ class CrushMap(object):
                 for child in sub_children:
                     bucket.add_item(child)
 
-                crushmap.buckets.add(bucket)
+                crushmap.buckets.add_bucket(bucket)
                 next_children.append(bucket)
             children = next_children
 
         # Create the default rule
         root_item = crushmap.get_item(name=root_type)
         host_type = crushmap.types.get_type(name=layers[0].get('type'))
-        crushmap.rules.add(Rule.default(root_item, host_type))
+        crushmap.rules.add_rule(Rule.default(root_item, host_type))
 
         return crushmap

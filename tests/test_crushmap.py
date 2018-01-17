@@ -26,7 +26,7 @@ class TestCRUSHmap(unittest.TestCase):
 
         self.assertIsInstance(self.crushmap.types.get_type(name='host'), Type)
 
-        host1 = self.crushmap.buckets.get(name='host1')
+        host1 = self.crushmap.buckets.get_bucket(name='host1')
         self.assertIsInstance(host1, Bucket)
         self.assertEqual(host1.id, -2)
         self.assertEqual(len(host1.items), 4)
@@ -48,9 +48,9 @@ class TestCRUSHmap(unittest.TestCase):
         """Test CRUSHmap.get_item()"""
         crushmap = CrushMap.create(4, [{'type': 'host', 'size': 2}])
         self.assertEqual(crushmap.get_item(name='osd.0').id, 0)
-        self.assertEqual(crushmap.get_item(id=-2).name, 'host1')
+        self.assertEqual(crushmap.get_item(item_id=-2).name, 'host1')
         with self.assertRaises(IndexError):
-            crushmap.get_item(id=-4)
+            crushmap.get_item(item_id=-4)
 
     def test_crusmap_create(self):
         CrushMap.create(4, [{'type': 'host', 'size': 2}])

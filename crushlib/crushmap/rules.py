@@ -7,7 +7,7 @@ from crushlib.crushmap.devices import Device
 from crushlib.crushmap.types import Type
 
 
-class Rules():
+class Rules(object):
 
     def __init__(self):
         self.__list = []
@@ -18,7 +18,7 @@ class Rules():
             out += str(rule)
         return out
 
-    def add(self, rule):
+    def add_rule(self, rule):
 
         utils.type_check(rule, Rule, 'rule')
 
@@ -28,24 +28,24 @@ class Rules():
 
         if rule_id < 0:
             raise ValueError("Expecting 'id' to be a positive integer")
-        if self.exists(id=rule_id):
+        if self.rule_exists(rule_id=rule_id):
             raise IndexError("Rule #{} already exists".format(rule_id))
-        if self.exists(name=rule.name):
+        if self.rule_exists(name=rule.name):
             raise IndexError("Rule {} already exists".format(rule.name))
 
         # All tests passed, now adding the rule with its assigned id
         rule.id = rule_id
         self.__list.append(rule)
 
-    def get(self, name=None, id=None):
+    def get_rule(self, name=None, rule_id=None):
 
         # Argument checking
-        if not (id is None or name is None):
+        if not (rule_id is None or name is None):
             raise ValueError("Only id or name can be searched at once")
 
         # Processing the actual request
-        if id is not None:
-            tmp = [i for i in self.__list if i.id == id]
+        if rule_id is not None:
+            tmp = [i for i in self.__list if i.id == rule_id]
         elif name is not None:
             tmp = [i for i in self.__list if i.name == name]
         else:
@@ -53,12 +53,12 @@ class Rules():
 
         if not tmp:
             raise IndexError("Could not find rule with {}={}".format(
-                'name' if name else 'id', name if name else id))
+                'name' if name else 'id', name if name else rule_id))
         return tmp[0]
 
-    def exists(self, name=None, id=None):
+    def rule_exists(self, name=None, rule_id=None):
         try:
-            self.get(name=name, id=id)
+            self.get_rule(name=name, rule_id=rule_id)
         except IndexError:
             return False
         return True
@@ -70,7 +70,7 @@ class Rules():
         return max(nums) + 1
 
 
-class Rule():
+class Rule(object):
 
     def __init__(self, rule_name, ruleset=None, steps=None,
                  rule_type='replicated', min_size=1, max_size=10):
@@ -113,7 +113,7 @@ class Rule():
         return Rule('replicated_ruleset', steps=steps)
 
 
-class Steps():
+class Steps(object):
 
     def __init__(self):
         self.__list = []
@@ -137,7 +137,7 @@ class Steps():
 
         if op == 'take':
             item = kwargs.get("item")
-            if not (isinstance(item, Device) or isinstance(item, Bucket)):
+            if not isinstance(item, (Device, Bucket)):
                 raise TypeError("item must be a Device or a Bucket")
             self.__list.append({"op": "take", "item": item})
 

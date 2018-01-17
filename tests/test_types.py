@@ -37,9 +37,9 @@ class TestTypes(unittest.TestCase):
     def test_exists(self):
         """Test success path for Types.type_exists()"""
         self.types.add_type("root", 3)
-        self.assertTrue(self.types.type_exists(id=3))
+        self.assertTrue(self.types.type_exists(type_id=3))
         self.assertTrue(self.types.type_exists(name='root'))
-        self.assertFalse(self.types.type_exists(id=0))
+        self.assertFalse(self.types.type_exists(type_id=0))
         self.assertFalse(self.types.type_exists(name='osd'))
 
     def test_createset(self):
@@ -98,7 +98,7 @@ class TestTypes(unittest.TestCase):
         with self.assertRaises(TypeError):
             self.types.type_exists(name=71)
         with self.assertRaises(TypeError):
-            self.types.type_exists(id="string")
+            self.types.type_exists(type_id="string")
         with self.assertRaises(ValueError):
             self.types.type_exists(name="")
 

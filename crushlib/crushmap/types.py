@@ -13,12 +13,17 @@ class Types(object):
 
     def __init__(self):
         self.__list = []
+        ":type: list[Type]"
 
     def __str__(self):
-        sort = sorted(self.__list, key=(lambda t: t.id))
+
+        def _type_id(type_obj):
+            return type_obj.id
+
+        sort = sorted(self.__list, key=_type_id)
         out = ''
-        for t in sort:
-            out += 'type {} {}\n'.format(t.id, t.name)
+        for obj in sort:
+            out += 'type {} {}\n'.format(obj.id, obj.name)
         return out
 
     def add_type(self, name, type_id):
@@ -26,7 +31,7 @@ class Types(object):
 
         if self.type_exists(name=name):
             raise IndexError("Name '{}' is already taken".format(name))
-        if self.type_exists(id=type_id):
+        if self.type_exists(type_id=type_id):
             raise IndexError("ID #{} is already taken".format(type_id))
 
         type_obj = Type(name, type_id)
@@ -56,9 +61,9 @@ class Types(object):
                 'name' if name else 'id', name if name else type_id))
         return tmp[0]
 
-    def type_exists(self, name=None, id=None):
+    def type_exists(self, name=None, type_id=None):
         try:
-            self.get_type(name=name, type_id=id)
+            self.get_type(name=name, type_id=type_id)
         except IndexError:
             return False
         return True
@@ -81,16 +86,16 @@ class Types(object):
             self.add_type(t, type_list.index(t))
 
 
-class Type():
+class Type(object):
 
-    def __init__(self, name, id):
-        utils.type_check(id, int, name='id')
+    def __init__(self, name, type_id):
+        utils.type_check(type_id, int, name='id')
         utils.type_check(name, str, name='name')
         if name == '':
             raise ValueError("Argument 'name' cannot be an empty string")
 
         self.name = name
-        self.id = id
+        self.id = type_id
         self.buckets = []
 
     def link_bucket(self, bucket_obj):

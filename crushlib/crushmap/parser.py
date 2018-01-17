@@ -83,7 +83,7 @@ def _parse_devices(map_obj, dev_list):
                              "to be an integer!")
 
         if name == ('osd.{}'.format(num)):
-            map_obj.devices.add(num)
+            map_obj.devices.add_device(num)
 
 
 def _parse_types(map_obj, types_list):
@@ -91,7 +91,7 @@ def _parse_types(map_obj, types_list):
         line = string.split()
 
         try:
-            id = int(line[1])
+            type_id = int(line[1])
             name = line[2]
         except IndexError:
             raise ValueError("Types Parsing error: Type declaration "
@@ -100,7 +100,7 @@ def _parse_types(map_obj, types_list):
             raise ValueError("Type Parsing error: Type ID expected "
                              "to be an integer!")
 
-        map_obj.types.add_type(name, id)
+        map_obj.types.add_type(name, type_id)
 
 
 def _parse_buckets(crushmap, buckets_list):
@@ -119,24 +119,24 @@ def _parse_buckets(crushmap, buckets_list):
                 item = (crushmap.get_item(name=value), float(line[3]))
                 items.append(item)
             elif head == 'id':
-                id = int(value)
+                bucket_id = int(value)
             elif head == 'alg':
                 alg = value
             elif head == 'hash':
                 if value == '0':
-                    hash = 'rjenkins1'
+                    crush_hash = 'rjenkins1'
                 else:
                     raise ValueError("Unknown hash {}".format(value))
             else:
                 raise ValueError("Unknown property {}".format(head))
 
-        bucket = Bucket(name, type_obj, id, alg, hash)
+        bucket = Bucket(name, type_obj, bucket_id, alg, crush_hash)
         for i in items:
             bucket.add_item(i[0], i[1])
         return bucket
 
     for bucket_raw in buckets_list:
-        crushmap.buckets.add(parse_bucket(bucket_raw))
+        crushmap.buckets.add_bucket(parse_bucket(bucket_raw))
 
 
 def _parse_rules(map_obj, rules_list):
@@ -177,4 +177,4 @@ def _parse_rules(map_obj, rules_list):
 
         rule = Rule(name, ruleset=ruleset, rule_type=rule_type,
                     steps=steps, min_size=min_size, max_size=max_size)
-        map_obj.rules.add(rule)
+        map_obj.rules.add_rule(rule)
