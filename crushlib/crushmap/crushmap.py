@@ -84,7 +84,7 @@ class CrushMap(object):
         for layer in layers:
             alg = layer.get('alg', 'straw')
             size = layer.get('size', 0)
-            type_obj = crushmap.types.get(name=layer['type'])
+            type_obj = crushmap.types.get_type(name=layer['type'])
 
             if size == 0:  # Only one bucket in the layer
                 name = layer['type']
@@ -115,7 +115,7 @@ class CrushMap(object):
 
         # Create the default rule
         root_item = crushmap.get_item(name=root_type)
-        host_type = crushmap.types.get(name=layers[0].get('type'))
+        host_type = crushmap.types.get_type(name=layers[0].get('type'))
         crushmap.rules.add(Rule.default(root_item, host_type))
 
         return crushmap

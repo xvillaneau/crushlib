@@ -18,27 +18,27 @@ class TestBuckets(unittest.TestCase):
     def test_buckets_add(self):
         """Test Buckets.add()"""
 
-        host0 = Bucket('host0', self.crushmap.types.get('host'))
+        host0 = Bucket('host0', self.crushmap.types.get_type('host'))
         host0.add_item(self.crushmap.get_item('osd.0'))
         host0.add_item(self.crushmap.get_item('osd.1'))
         self.crushmap.buckets.add(host0)
 
-        host1 = Bucket('host1', self.crushmap.types.get('host'))
+        host1 = Bucket('host1', self.crushmap.types.get_type('host'))
         host1.add_item(self.crushmap.get_item('osd.2'))
         host1.add_item(self.crushmap.get_item('osd.3'))
         self.crushmap.buckets.add(host1)
 
-        root = Bucket('root', self.crushmap.types.get('root'))
+        root = Bucket('root', self.crushmap.types.get_type('root'))
         root.add_item(host0)
         root.add_item(host1)
         self.crushmap.buckets.add(root)
 
         with self.assertRaises(IndexError):
             self.crushmap.buckets.add(
-                Bucket('root', self.crushmap.types.get('root')))
+                Bucket('root', self.crushmap.types.get_type('root')))
         with self.assertRaises(IndexError):
             self.crushmap.buckets.add(
-                Bucket('root2', self.crushmap.types.get('root'), id=-3))
+                Bucket('root2', self.crushmap.types.get_type('root'), id=-3))
 
     def test_buckets_get(self):
         """Test for Buckets.get()"""
@@ -76,7 +76,7 @@ class TestBuckets(unittest.TestCase):
         self.assertFalse(self.crushmap.buckets.exists('testABC'))
 
     def test_bucket_init(self):
-        t = self.crushmap.types.get('host')
+        t = self.crushmap.types.get_type('host')
 
         with self.assertRaises(ValueError):
             Bucket('test', t, id=0)
@@ -86,7 +86,7 @@ class TestBuckets(unittest.TestCase):
             Bucket('test', t, hash='test')
 
     def test_bucket_additem(self):
-        t = self.crushmap.types.get('host')
+        t = self.crushmap.types.get_type('host')
         b = Bucket('test', t)
 
         with self.assertRaises(TypeError):
@@ -94,7 +94,7 @@ class TestBuckets(unittest.TestCase):
 
     def test_bucket_weight(self):
 
-        t = self.crushmap.types.get('host')
+        t = self.crushmap.types.get_type('host')
         b1 = Bucket('test1', t)
         b2 = Bucket('test2', t)
         b1.add_item(b2)

@@ -15,17 +15,17 @@ class TestRules(unittest.TestCase):
         self.crushmap.devices.create_bunch(4)
         self.crushmap.types.create_set(['osd', 'host', 'root'])
 
-        host0 = Bucket('host0', self.crushmap.types.get('host'))
+        host0 = Bucket('host0', self.crushmap.types.get_type('host'))
         host0.add_item(self.crushmap.get_item('osd.0'))
         host0.add_item(self.crushmap.get_item('osd.1'))
         self.crushmap.buckets.add(host0)
 
-        host1 = Bucket('host1', self.crushmap.types.get('host'))
+        host1 = Bucket('host1', self.crushmap.types.get_type('host'))
         host1.add_item(self.crushmap.get_item('osd.2'))
         host1.add_item(self.crushmap.get_item('osd.3'))
         self.crushmap.buckets.add(host1)
 
-        root = Bucket('root', self.crushmap.types.get('root'))
+        root = Bucket('root', self.crushmap.types.get_type('root'))
         root.add_item(host0)
         root.add_item(host1)
         self.crushmap.buckets.add(root)
@@ -77,7 +77,7 @@ class TestRules(unittest.TestCase):
 
     def test_rule_default(self):
         root_item = self.crushmap.get_item('root')
-        host_type = self.crushmap.types.get('host')
+        host_type = self.crushmap.types.get_type('host')
         r = Rule.default(root_item, host_type)
         self.assertIsInstance(r, Rule)
         self.assertEqual(r.name, 'replicated_ruleset')
@@ -91,7 +91,7 @@ class TestRules(unittest.TestCase):
         with self.assertRaises(TypeError):
             steps.add('take', item='test')
 
-        t = self.crushmap.types.get('host')
+        t = self.crushmap.types.get_type('host')
         steps.add('choose', scheme='firstn', num=0, type=t)
         steps.add('choose', scheme='indep', num=2, type=t)
         steps.add('chooseleaf', scheme='firstn', num=-1, type=t)

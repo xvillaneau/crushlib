@@ -1,10 +1,15 @@
 
+"""
+Type-related classes definitions for the CRUSH map
+"""
+
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 from crushlib import utils
 
 
-class Types():
+class Types(object):
+    """Represents a set of types in the CRUSH map"""
 
     def __init__(self):
         self.__list = []
@@ -16,29 +21,31 @@ class Types():
             out += 'type {} {}\n'.format(t.id, t.name)
         return out
 
-    def add(self, name, id):
+    def add_type(self, name, type_id):
+        """Add a new type to the CRUSH map"""
 
-        if self.exists(name=name):
+        if self.type_exists(name=name):
             raise IndexError("Name '{}' is already taken".format(name))
-        if self.exists(id=id):
-            raise IndexError("ID #{} is already taken".format(id))
+        if self.type_exists(id=type_id):
+            raise IndexError("ID #{} is already taken".format(type_id))
 
-        type_obj = Type(name, id)
+        type_obj = Type(name, type_id)
         self.__list.append(type_obj)
 
-    def get(self, name=None, id=None):
+    def get_type(self, name=None, type_id=None):
+        """Get a type object from the CRUSH map"""
 
         # Argument checking
-        if not (id is None or name is None):
+        if not (type_id is None or name is None):
             raise ValueError("Only id or name can be searched at once")
-        utils.type_check(id, int, name='id', none=True)
+        utils.type_check(type_id, int, name='id', none=True)
         utils.type_check(name, str, name='name', none=True)
         if name is not None and name == "":
             raise ValueError("Argument 'name' cannot be an empty string")
 
         # Processing the actual request
-        if id is not None:
-            tmp = [t for t in self.__list if t.id == id]
+        if type_id is not None:
+            tmp = [t for t in self.__list if t.id == type_id]
         elif name is not None:
             tmp = [t for t in self.__list if t.name == name]
         else:
@@ -46,12 +53,12 @@ class Types():
 
         if not tmp:
             raise IndexError("Could not find type with {}={}".format(
-                'name' if name else 'id', name if name else id))
+                'name' if name else 'id', name if name else type_id))
         return tmp[0]
 
-    def exists(self, name=None, id=None):
+    def type_exists(self, name=None, id=None):
         try:
-            self.get(name=name, id=id)
+            self.get_type(name=name, type_id=id)
         except IndexError:
             return False
         return True
@@ -71,7 +78,7 @@ class Types():
             raise ValueError("All elements in input must be unique")
 
         for t in type_list:
-            self.add(t, type_list.index(t))
+            self.add_type(t, type_list.index(t))
 
 
 class Type():

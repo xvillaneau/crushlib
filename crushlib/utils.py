@@ -1,13 +1,19 @@
 
+"""
+Global utilities for CRUSHlib
+"""
+
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
-try:
-    import ConfigParser as configparser
-except ImportError:  # pragma: no cover
-    import configparser
 
 
 def type_check(test_obj, test_type, name='', none=False):
+    """
+    Check that an object has the given type, raise TypeError otherwise.
+    A special case for str makes it a bit more Py2/3 compatible
+
+    :raises TypeError: Type of object does not match
+    """
 
     # Compatibility for Python 2 and 3
     if test_type is str:

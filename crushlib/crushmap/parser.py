@@ -100,7 +100,7 @@ def _parse_types(map_obj, types_list):
             raise ValueError("Type Parsing error: Type ID expected "
                              "to be an integer!")
 
-        map_obj.types.add(name, id)
+        map_obj.types.add_type(name, id)
 
 
 def _parse_buckets(crushmap, buckets_list):
@@ -113,7 +113,7 @@ def _parse_buckets(crushmap, buckets_list):
             value = line[1]
 
             if line[-1] == '{':  # First line: open bucket declaration
-                type_obj = crushmap.types.get(name=head)
+                type_obj = crushmap.types.get_type(name=head)
                 name = value
             elif head == 'item':
                 item = (crushmap.get_item(name=value), float(line[3]))
@@ -166,7 +166,7 @@ def _parse_rules(map_obj, rules_list):
                 elif op in ('choose', 'chooseleaf'):
                     scheme = l[2]
                     num = int(l[3])
-                    type_obj = map_obj.types.get(name=l[5])
+                    type_obj = map_obj.types.get_type(name=l[5])
                     steps.add(op, scheme=scheme, num=num, type=type_obj)
                 elif op == 'emit':
                     steps.add(op)

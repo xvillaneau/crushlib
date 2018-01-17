@@ -24,7 +24,7 @@ class TestCRUSHmap(unittest.TestCase):
 
         self.assertEqual(self.crushmap.devices.next_id(), 16)
 
-        self.assertIsInstance(self.crushmap.types.get(name='host'), Type)
+        self.assertIsInstance(self.crushmap.types.get_type(name='host'), Type)
 
         host1 = self.crushmap.buckets.get(name='host1')
         self.assertIsInstance(host1, Bucket)
