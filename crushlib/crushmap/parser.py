@@ -2,8 +2,7 @@
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import re
-from crushlib.crushmap.rules import Rule, Steps
-from crushlib.crushmap.buckets import Bucket
+from . import Rule, Steps, Bucket
 
 
 def parse_raw(crushmap, map_obj):

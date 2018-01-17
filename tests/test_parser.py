@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import unittest
 
-from crushlib.crushmap import CRUSHmap
+from crushlib.crushmap import CrushMap
 from crushlib.crushmap.parser import _raw_to_dict, _parse_tunables, \
                                      _parse_devices, _parse_types, \
                                      _parse_buckets, _parse_rules
@@ -12,7 +12,7 @@ from crushlib.crushmap.parser import _raw_to_dict, _parse_tunables, \
 class TestParser(unittest.TestCase):
 
     def setUp(self):
-        self.map = CRUSHmap()
+        self.map = CrushMap()
 
     def tearDown(self):
         self.map = None

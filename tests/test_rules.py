@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import unittest
 
-from crushlib.crushmap import CRUSHmap
+from crushlib.crushmap import CrushMap
 from crushlib.crushmap.rules import Steps, Rule
 from crushlib.crushmap.buckets import Bucket
 
@@ -11,7 +11,7 @@ from crushlib.crushmap.buckets import Bucket
 class TestRules(unittest.TestCase):
 
     def setUp(self):
-        self.crushmap = CRUSHmap()
+        self.crushmap = CrushMap()
         self.crushmap.devices.create_bunch(4)
         self.crushmap.types.create_set(['osd', 'host', 'root'])
 

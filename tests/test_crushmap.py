@@ -1,20 +1,18 @@
 
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
+import os
 import unittest
 
-from crushlib.crushmap import CRUSHmap
-from crushlib.crushmap.types import Type
-from crushlib.crushmap.buckets import Bucket
+from crushlib.crushmap import CrushMap, Type, Bucket
 
-import os
 FILES_DIR = os.path.join(os.path.dirname(__file__), 'files')
 
 
 class TestCRUSHmap(unittest.TestCase):
 
     def setUp(self):
-        self.crushmap = CRUSHmap()
+        self.crushmap = CrushMap()
 
     def tearDown(self):
         self.crushmap = None
@@ -48,18 +46,18 @@ class TestCRUSHmap(unittest.TestCase):
 
     def test_get_item(self):
         """Test CRUSHmap.get_item()"""
-        crushmap = CRUSHmap.create(4, [{'type': 'host', 'size': 2}])
+        crushmap = CrushMap.create(4, [{'type': 'host', 'size': 2}])
         self.assertEqual(crushmap.get_item(name='osd.0').id, 0)
         self.assertEqual(crushmap.get_item(id=-2).name, 'host1')
         with self.assertRaises(IndexError):
             crushmap.get_item(id=-4)
 
     def test_crusmap_create(self):
-        CRUSHmap.create(4, [{'type': 'host', 'size': 2}])
-        CRUSHmap.create(15, [{'type': 'host', 'size': 4},
+        CrushMap.create(4, [{'type': 'host', 'size': 2}])
+        CrushMap.create(15, [{'type': 'host', 'size': 4},
                              {'type': 'psu', 'size': 3}])
-        c = CRUSHmap.create(4, [{'type': 'host', 'size': 2},
+        c = CrushMap.create(4, [{'type': 'host', 'size': 2},
                                 {'type': 'myroot'}])
         self.assertEqual(c.get_item(name='myroot').id, -3)
         with self.assertRaises(ValueError):
-            CRUSHmap.create(4, [{'type': 'root', 'size': 2}])
+            CrushMap.create(4, [{'type': 'root', 'size': 2}])

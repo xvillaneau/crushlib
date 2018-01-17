@@ -3,8 +3,7 @@ from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 
 from crushlib import utils
-from crushlib.crushmap.devices import Device
-from crushlib.crushmap.types import Type
+from . import Device, Type
 
 
 class Buckets():
