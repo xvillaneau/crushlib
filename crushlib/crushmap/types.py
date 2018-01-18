@@ -26,6 +26,10 @@ class Types(object):
             out += 'type {} {}\n'.format(obj.id, obj.name)
         return out
 
+    def __repr__(self):
+        types = ', '.join(repr(t) for t in self.__list)
+        return '<Types [{}]>'.format(types)
+
     def add_type(self, name, type_id):
         """Add a new type to the CRUSH map"""
 
@@ -101,8 +105,6 @@ class Type(object):
 
         self.name = name
         self.id = type_id
-        self.buckets = []
 
-    def link_bucket(self, bucket_obj):
-        """Link a bucket object to this type"""
-        self.buckets.append(bucket_obj)
+    def __repr__(self):
+        return '<Type name={} id={}>'.format(self.name, self.id)

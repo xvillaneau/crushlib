@@ -13,6 +13,9 @@ class Devices(object):
     def __init__(self):
         self.__list = []
 
+    def __repr__(self):
+        return "<Devices count={}>".format(len(self.__list))
+
     def __str__(self):
         nums = [dev.id for dev in self.__list]
         out = ""
@@ -105,8 +108,6 @@ class Device(object):
 
         self.id = device_id
         self.name = "osd.{}".format(device_id)
-        self.is_item_of = []
 
-    def link_bucket(self, bucket):
-        """Mark a bucket as parent of this device"""
-        self.is_item_of.append(bucket)
+    def __repr__(self):
+        return "<Device {}>".format(self.name)

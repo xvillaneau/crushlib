@@ -20,12 +20,17 @@ class Buckets(object):
     def __init__(self):
         """Buckets constructor."""
         self.__list = []
+        """:type: list[Bucket]"""
 
     def __str__(self):
         out = ""
         for b in self.__list:
             out += str(b)
         return out
+
+    def __repr__(self):
+        buckets = ', '.join(repr(b) for b in self.__list)
+        return '<Buckets [{}]>'.format(buckets)
 
     def add_bucket(self, bucket):
         """Add a bucket object to the set.
@@ -116,11 +121,10 @@ class Bucket(object):
         self.alg = alg
         self.hash = crush_hash
         self.items = []
-        self.is_item_of = []
 
-        self.type.link_bucket(self)
-
-    # TODO: Destroy handler that un-links bucket to the Type
+    def __repr__(self):
+        return "<Bucket type={} id={} name={} n_items=>".format(
+            self.type, self.id, self.name, len(self.items))
 
     def __str__(self):
         hash_id = 0  # There is no other possibiloty anyway
@@ -150,7 +154,6 @@ class Bucket(object):
             item['weight'] = weight
         elif not isinstance(obj, Bucket):
             raise TypeError("item must be a Bucket or a Device")
-        obj.link_bucket(self)
 
         self.items.append(item)
 
@@ -172,7 +175,3 @@ class Bucket(object):
             else:
                 weight += obj.weight(traversed)
         return weight
-
-    def link_bucket(self, bucket):
-        """Used when a parent bucket declares this bucket as item"""
-        self.is_item_of.append(bucket)

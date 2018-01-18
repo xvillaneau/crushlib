@@ -30,7 +30,6 @@ class TestCRUSHmap(unittest.TestCase):
         self.assertIsInstance(host1, Bucket)
         self.assertEqual(host1.id, -2)
         self.assertEqual(len(host1.items), 4)
-        self.assertEqual(host1.is_item_of[0].name, 'psu0')
 
     def test_import_missingdev(self):
         """Import of a map in which osd.7 is absent"""
