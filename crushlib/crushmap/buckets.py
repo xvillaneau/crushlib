@@ -123,7 +123,7 @@ class Bucket(object):
         self.items = []
 
     def __repr__(self):
-        return "<Bucket type={} id={} name={} n_items=>".format(
+        return "<Bucket type={} id={} name={} n_items={}>".format(
             self.type, self.id, self.name, len(self.items))
 
     def __str__(self):
