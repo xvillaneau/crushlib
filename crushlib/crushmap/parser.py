@@ -1,4 +1,8 @@
 
+"""
+Functions for loading a CRUSH map abstraction from a text file
+"""
+
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import re
@@ -6,6 +10,13 @@ from . import Rule, Steps, Bucket
 
 
 def parse_raw(crushmap, map_obj):
+    """
+    Load a text CRUSH map into an object
+
+    :param crushmap: Raw CRUSH map text
+    :param map_obj: Object into which the map will be loaded
+    :type map_obj: crushlib.crushmap.CrushMap
+    """
     parsed = _raw_to_dict(crushmap)
     _parse_tunables(map_obj, parsed['tunable'])
     _parse_devices(map_obj, parsed['device'])
@@ -105,7 +116,7 @@ def _parse_types(map_obj, types_list):
 
 def _parse_buckets(crushmap, buckets_list):
 
-    def parse_bucket(bucket_raw):
+    def _parse_bucket(bucket_raw):
         items = []
         for string in bucket_raw:
             line = string.split()
@@ -136,7 +147,7 @@ def _parse_buckets(crushmap, buckets_list):
         return bucket
 
     for bucket_raw in buckets_list:
-        crushmap.buckets.add_bucket(parse_bucket(bucket_raw))
+        crushmap.buckets.add_bucket(_parse_bucket(bucket_raw))
 
 
 def _parse_rules(map_obj, rules_list):

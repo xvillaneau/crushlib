@@ -1,6 +1,6 @@
 
 from __future__ import absolute_import, division, \
-                       print_function, unicode_literals
+                       print_function
 import os
 import unittest
 
@@ -46,18 +46,16 @@ class TestCRUSHmap(unittest.TestCase):
 
     def test_get_item(self):
         """Test CRUSHmap.get_item()"""
-        crushmap = CrushMap.create(4, [{'type': 'host', 'size': 2}])
+        crushmap = CrushMap.create(4, [('host', 2)])
         self.assertEqual(crushmap.get_item(name='osd.0').id, 0)
         self.assertEqual(crushmap.get_item(item_id=-2).name, 'host1')
         with self.assertRaises(IndexError):
             crushmap.get_item(item_id=-4)
 
     def test_crusmap_create(self):
-        CrushMap.create(4, [{'type': 'host', 'size': 2}])
-        CrushMap.create(15, [{'type': 'host', 'size': 4},
-                             {'type': 'psu', 'size': 3}])
-        c = CrushMap.create(4, [{'type': 'host', 'size': 2},
-                                {'type': 'myroot'}])
+        CrushMap.create(4, [('host', 2)])
+        CrushMap.create(15, [('host', 4), ('psu', 3)])
+        c = CrushMap.create(4, [('host', 2), ('myroot', 0)])
         self.assertEqual(c.get_item(name='myroot').id, -3)
         with self.assertRaises(ValueError):
-            CrushMap.create(4, [{'type': 'root', 'size': 2}])
+            CrushMap.create(4, [('root', 2)])

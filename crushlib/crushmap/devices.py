@@ -1,11 +1,14 @@
 
+"""
+Classes for device abstraction in the CRUSH map
+"""
+
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 
-from crushlib import utils
-
 
 class Devices(object):
+    """Represents the devices of a CRUSH map"""
 
     def __init__(self):
         self.__list = []
@@ -19,8 +22,13 @@ class Devices(object):
         return out
 
     def add_device(self, dev_id=None):
+        """
+        Add a device to the set
 
-        utils.type_check(dev_id, int, 'dev_id', True)
+        :param dev_id: ID of the device to create
+        :type dev_id: int
+        """
+
         if dev_id is None:
             dev_id = self.next_id()
         if self.device_exists(dev_id=dev_id):
@@ -31,6 +39,7 @@ class Devices(object):
         return dev_id
 
     def next_id(self):
+        """Get the next available ID in the set"""
 
         if not self.__list:
             return 0
@@ -40,6 +49,7 @@ class Devices(object):
         return min(candidates)
 
     def device_exists(self, name=None, dev_id=None):
+        """Check if a device exists"""
         try:
             self.get_device(name=name, dev_id=dev_id)
         except IndexError:
@@ -47,6 +57,7 @@ class Devices(object):
         return True
 
     def get_device(self, name=None, dev_id=None):
+        """Get a device from the set"""
 
         # Argument checking
         if not (dev_id is None or name is None):
@@ -66,8 +77,12 @@ class Devices(object):
         return tmp[0]
 
     def create_bunch(self, num):
+        """
+        Create a lot of devices. Only works if none were defined
+        :param num: How many devices to create
+        :type num: int
+        """
 
-        utils.type_check(num, int, 'num')
         if self.__list:
             raise IndexError("Can only be done on an empty Devices list")
         if num < 1:
@@ -79,6 +94,9 @@ class Devices(object):
 
 
 class Device(object):
+    """
+    Device abstraction for the CRUSH map
+    """
 
     def __init__(self, device_id):
 
@@ -90,4 +108,5 @@ class Device(object):
         self.is_item_of = []
 
     def link_bucket(self, bucket):
+        """Mark a bucket as parent of this device"""
         self.is_item_of.append(bucket)

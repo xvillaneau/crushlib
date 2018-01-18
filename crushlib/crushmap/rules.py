@@ -1,4 +1,8 @@
 
+"""
+Classes for rule abstraction in the CRUSH map
+"""
+
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 from crushlib import utils
@@ -8,6 +12,7 @@ from crushlib.crushmap.types import Type
 
 
 class Rules(object):
+    """Represents a set of rules"""
 
     def __init__(self):
         self.__list = []
@@ -19,6 +24,7 @@ class Rules(object):
         return out
 
     def add_rule(self, rule):
+        """Add a rule to the set"""
 
         utils.type_check(rule, Rule, 'rule')
 
@@ -38,6 +44,7 @@ class Rules(object):
         self.__list.append(rule)
 
     def get_rule(self, name=None, rule_id=None):
+        """Get a rule from the set"""
 
         # Argument checking
         if not (rule_id is None or name is None):
@@ -57,6 +64,7 @@ class Rules(object):
         return tmp[0]
 
     def rule_exists(self, name=None, rule_id=None):
+        """Check if a rule exists in the set"""
         try:
             self.get_rule(name=name, rule_id=rule_id)
         except IndexError:
@@ -64,6 +72,7 @@ class Rules(object):
         return True
 
     def next_id(self):
+        """Get the next available rule ID"""
         if not self.__list:
             return 0
         nums = [i.id for i in self.__list]
@@ -71,6 +80,7 @@ class Rules(object):
 
 
 class Rule(object):
+    """Represents a rule in the CRUSH map"""
 
     def __init__(self, rule_name, ruleset=None, steps=None,
                  rule_type='replicated', min_size=1, max_size=10):
@@ -106,6 +116,7 @@ class Rule(object):
 
     @staticmethod
     def default(root_item, host_type):
+        """Create a default replicated rule"""
         steps = Steps()
         steps.add('take', item=root_item)
         steps.add('chooseleaf', type=host_type)
@@ -114,6 +125,7 @@ class Rule(object):
 
 
 class Steps(object):
+    """Represents a set of steps in a rule"""
 
     def __init__(self):
         self.__list = []
@@ -132,6 +144,7 @@ class Steps(object):
         return out
 
     def add(self, op, **kwargs):
+        """Add a step to the rule"""
 
         utils.type_check(op, str, 'op')
 

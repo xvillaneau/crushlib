@@ -62,6 +62,7 @@ class Types(object):
         return tmp[0]
 
     def type_exists(self, name=None, type_id=None):
+        """Check if a type exists in the collection"""
         try:
             self.get_type(name=name, type_id=type_id)
         except IndexError:
@@ -69,6 +70,7 @@ class Types(object):
         return True
 
     def create_set(self, type_list):
+        """Fast creation of a set of types from a list of names"""
 
         if self.__list:
             raise IndexError("This can only be done on an empty types list")
@@ -87,6 +89,9 @@ class Types(object):
 
 
 class Type(object):
+    """
+    Abstraction for a single type in CRUSH
+    """
 
     def __init__(self, name, type_id):
         utils.type_check(type_id, int, name='id')
@@ -99,4 +104,5 @@ class Type(object):
         self.buckets = []
 
     def link_bucket(self, bucket_obj):
+        """Link a bucket object to this type"""
         self.buckets.append(bucket_obj)

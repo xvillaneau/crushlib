@@ -1,14 +1,16 @@
 
+"""Global abstraction class for a CRUSH map"""
+
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 
 import math
-from crushlib import utils
 from .parser import parse_raw
 from . import Tunables, Devices, Types, Bucket, Buckets, Rule, Rules
 
 
 class CrushMap(object):
+    """Represents a Ceph CRUSH map"""
 
     def __init__(self):
         self.tunables = Tunables()
@@ -33,11 +35,13 @@ class CrushMap(object):
         return out
 
     def read_file(self, crush_filename):
+        """Open a CRUSH text file and load its contents"""
         with open(crush_filename) as f:
             self.raw_map = f.read()
         parse_raw(self.raw_map, self)
 
     def get_item(self, name=None, item_id=None):
+        """Get an item (device or bucket) of the map, by name or ID"""
         item = None
         try:
             item = self.devices.get_device(name=name, dev_id=item_id)
@@ -52,44 +56,45 @@ class CrushMap(object):
         return item
 
     @staticmethod
-    def create(osds, layers):
+    def create(osds, layers, alg='straw'):
+        """
+        Construct a simple CRUSH map
 
-        utils.type_check(osds, int, 'osds')
-        utils.type_check(layers, list, 'layers')
-        for i in layers:
-            utils.type_check(i, dict, 'layers elements')
+        :param osds: Number of device to create in the map
+        :type osds: int
+        :param layers: List of layers to crate, as tuples of name and size
+        :type layers: list[(str, int)]
+        :param alg: Algorithm to use globally. Defaults to 'straw'
+        """
 
         # Ensure that a root exists
         root_type = 'root'
-        if layers[-1].get('size', 0) == 0:
+
+        if layers[-1][1] == 0:
             # The last type is a root: get its name
-            root_type = layers[-1].get('type')
-        elif 'root' in [l['type'] for l in layers]:
+            root_type = layers[-1][0]
+        elif any(name == 'root' for name, _ in layers):
             # There is no root at the end and the 'root' name is taken
             raise ValueError("Failed to create a root, as the 'root' "
                              "name is already in use")
         else:
             # Create a root
-            layers.append({'type': 'root'})
+            layers.append((str('root'), 0))
 
         # Initiate the CRUSH map
         crushmap = CrushMap()
         crushmap.devices.create_bunch(osds)
-        types_list = ['osd'] + [l['type'] for l in layers]
+        types_list = ['osd'] + [name for name, _ in layers]
         crushmap.types.create_set(types_list)
 
         children = crushmap.devices.get_device()
 
         # Generate the buckets. This is the complex part
-        for layer in layers:
-            alg = layer.get('alg', 'straw')
-            size = layer.get('size', 0)
-            type_obj = crushmap.types.get_type(name=layer['type'])
+        for layer, size in layers:
+            type_obj = crushmap.types.get_type(name=layer)
 
             if size == 0:  # Only one bucket in the layer
-                name = layer['type']
-
-                bucket = Bucket(name, type_obj, alg=alg)
+                bucket = Bucket(layer, type_obj, alg=alg)
                 for child in children:
                     bucket.add_item(child)
 
@@ -103,7 +108,7 @@ class CrushMap(object):
 
             for i in range(0, num_items):
                 sub_children = children[(i * size):((i+1) * size)]
-                name = '{}{}'.format(layer['type'], i)
+                name = '{}{}'.format(layer, i)
 
                 bucket = Bucket(name, type_obj, alg=alg)
                 for child in sub_children:
@@ -115,7 +120,7 @@ class CrushMap(object):
 
         # Create the default rule
         root_item = crushmap.get_item(name=root_type)
-        host_type = crushmap.types.get_type(name=layers[0].get('type'))
+        host_type = crushmap.types.get_type(name=layers[0][0])
         crushmap.rules.add_rule(Rule.default(root_item, host_type))
 
         return crushmap

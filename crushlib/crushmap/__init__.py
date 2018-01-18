@@ -1,4 +1,8 @@
 
+"""
+CRUSH map abstraction layer
+"""
+
 from __future__ import absolute_import
 
 # Import all here for convenience
