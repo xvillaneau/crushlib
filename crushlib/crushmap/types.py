@@ -1,44 +1,60 @@
 
+"""
+Type-related classes definitions for the CRUSH map
+"""
+
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 from crushlib import utils
 
 
-class Types():
+class Types(object):
+    """Represents a set of types in the CRUSH map"""
 
     def __init__(self):
         self.__list = []
+        ":type: list[Type]"
 
     def __str__(self):
-        sort = sorted(self.__list, key=(lambda t: t.id))
+
+        def _type_id(type_obj):
+            return type_obj.id
+
+        sort = sorted(self.__list, key=_type_id)
         out = ''
-        for t in sort:
-            out += 'type {} {}\n'.format(t.id, t.name)
+        for obj in sort:
+            out += 'type {} {}\n'.format(obj.id, obj.name)
         return out
 
-    def add(self, name, id):
+    def __repr__(self):
+        types = ', '.join(repr(t) for t in self.__list)
+        return '<Types [{}]>'.format(types)
 
-        if self.exists(name=name):
+    def add_type(self, name, type_id):
+        """Add a new type to the CRUSH map"""
+
+        if self.type_exists(name=name):
             raise IndexError("Name '{}' is already taken".format(name))
-        if self.exists(id=id):
-            raise IndexError("ID #{} is already taken".format(id))
+        if self.type_exists(type_id=type_id):
+            raise IndexError("ID #{} is already taken".format(type_id))
 
-        type_obj = Type(name, id)
+        type_obj = Type(name, type_id)
         self.__list.append(type_obj)
 
-    def get(self, name=None, id=None):
+    def get_type(self, name=None, type_id=None):
+        """Get a type object from the CRUSH map"""
 
         # Argument checking
-        if not (id is None or name is None):
+        if not (type_id is None or name is None):
             raise ValueError("Only id or name can be searched at once")
-        utils.type_check(id, int, name='id', none=True)
+        utils.type_check(type_id, int, name='id', none=True)
         utils.type_check(name, str, name='name', none=True)
         if name is not None and name == "":
             raise ValueError("Argument 'name' cannot be an empty string")
 
         # Processing the actual request
-        if id is not None:
-            tmp = [t for t in self.__list if t.id == id]
+        if type_id is not None:
+            tmp = [t for t in self.__list if t.id == type_id]
         elif name is not None:
             tmp = [t for t in self.__list if t.name == name]
         else:
@@ -46,17 +62,19 @@ class Types():
 
         if not tmp:
             raise IndexError("Could not find type with {}={}".format(
-                'name' if name else 'id', name if name else id))
+                'name' if name else 'id', name if name else type_id))
         return tmp[0]
 
-    def exists(self, name=None, id=None):
+    def type_exists(self, name=None, type_id=None):
+        """Check if a type exists in the collection"""
         try:
-            self.get(name=name, id=id)
+            self.get_type(name=name, type_id=type_id)
         except IndexError:
             return False
         return True
 
     def create_set(self, type_list):
+        """Fast creation of a set of types from a list of names"""
 
         if self.__list:
             raise IndexError("This can only be done on an empty types list")
@@ -71,20 +89,22 @@ class Types():
             raise ValueError("All elements in input must be unique")
 
         for t in type_list:
-            self.add(t, type_list.index(t))
+            self.add_type(t, type_list.index(t))
 
 
-class Type():
+class Type(object):
+    """
+    Abstraction for a single type in CRUSH
+    """
 
-    def __init__(self, name, id):
-        utils.type_check(id, int, name='id')
+    def __init__(self, name, type_id):
+        utils.type_check(type_id, int, name='id')
         utils.type_check(name, str, name='name')
         if name == '':
             raise ValueError("Argument 'name' cannot be an empty string")
 
         self.name = name
-        self.id = id
-        self.buckets = []
+        self.id = type_id
 
-    def link_bucket(self, bucket_obj):
-        self.buckets.append(bucket_obj)
+    def __repr__(self):
+        return '<Type name={} id={}>'.format(self.name, self.id)

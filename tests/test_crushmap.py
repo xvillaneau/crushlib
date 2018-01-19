@@ -1,20 +1,18 @@
 
 from __future__ import absolute_import, division, \
-                       print_function, unicode_literals
+                       print_function
+import os
 import unittest
 
-from crushlib.crushmap import CRUSHmap
-from crushlib.crushmap.types import Type
-from crushlib.crushmap.buckets import Bucket
+from crushlib.crushmap import CrushMap, Type, Bucket
 
-import os
 FILES_DIR = os.path.join(os.path.dirname(__file__), 'files')
 
 
 class TestCRUSHmap(unittest.TestCase):
 
     def setUp(self):
-        self.crushmap = CRUSHmap()
+        self.crushmap = CrushMap()
 
     def tearDown(self):
         self.crushmap = None
@@ -26,13 +24,12 @@ class TestCRUSHmap(unittest.TestCase):
 
         self.assertEqual(self.crushmap.devices.next_id(), 16)
 
-        self.assertIsInstance(self.crushmap.types.get(name='host'), Type)
+        self.assertIsInstance(self.crushmap.types.get_type(name='host'), Type)
 
-        host1 = self.crushmap.buckets.get(name='host1')
+        host1 = self.crushmap.buckets.get_bucket(name='host1')
         self.assertIsInstance(host1, Bucket)
         self.assertEqual(host1.id, -2)
         self.assertEqual(len(host1.items), 4)
-        self.assertEqual(host1.is_item_of[0].name, 'psu0')
 
     def test_import_missingdev(self):
         """Import of a map in which osd.7 is absent"""
@@ -48,18 +45,16 @@ class TestCRUSHmap(unittest.TestCase):
 
     def test_get_item(self):
         """Test CRUSHmap.get_item()"""
-        crushmap = CRUSHmap.create(4, [{'type': 'host', 'size': 2}])
+        crushmap = CrushMap.create(4, [('host', 2)])
         self.assertEqual(crushmap.get_item(name='osd.0').id, 0)
-        self.assertEqual(crushmap.get_item(id=-2).name, 'host1')
+        self.assertEqual(crushmap.get_item(item_id=-2).name, 'host1')
         with self.assertRaises(IndexError):
-            crushmap.get_item(id=-4)
+            crushmap.get_item(item_id=-4)
 
     def test_crusmap_create(self):
-        CRUSHmap.create(4, [{'type': 'host', 'size': 2}])
-        CRUSHmap.create(15, [{'type': 'host', 'size': 4},
-                             {'type': 'psu', 'size': 3}])
-        c = CRUSHmap.create(4, [{'type': 'host', 'size': 2},
-                                {'type': 'myroot'}])
+        CrushMap.create(4, [('host', 2)])
+        CrushMap.create(15, [('host', 4), ('psu', 3)])
+        c = CrushMap.create(4, [('host', 2), ('myroot', 0)])
         self.assertEqual(c.get_item(name='myroot').id, -3)
         with self.assertRaises(ValueError):
-            CRUSHmap.create(4, [{'type': 'root', 'size': 2}])
+            CrushMap.create(4, [('root', 2)])

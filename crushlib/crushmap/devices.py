@@ -1,36 +1,48 @@
 
+"""
+Classes for device abstraction in the CRUSH map
+"""
+
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 
-from crushlib import utils
 
-
-class Devices():
+class Devices(object):
+    """Represents the devices of a CRUSH map"""
 
     def __init__(self):
         self.__list = []
+
+    def __repr__(self):
+        return "<Devices count={}>".format(len(self.__list))
 
     def __str__(self):
         nums = [dev.id for dev in self.__list]
         out = ""
         for i in range(0, max(nums) + 1):
-            name = self.get(id=i).name if i in nums else 'device' + str(i)
+            name = self.get_device(dev_id=i).name if i in nums else 'device' + str(i)
             out += 'device {} {}\n'.format(i, name)
         return out
 
-    def add(self, id=None):
+    def add_device(self, dev_id=None):
+        """
+        Add a device to the set
 
-        utils.type_check(id, int, 'id', True)
-        if id is None:
-            id = self.next_id()
-        if self.exists(id=id):
-            raise IndexError("Device {} already exists".format(id))
+        :param dev_id: ID of the device to create
+        :type dev_id: int
+        """
 
-        self.__list.append(Device(id))
+        if dev_id is None:
+            dev_id = self.next_id()
+        if self.device_exists(dev_id=dev_id):
+            raise IndexError("Device {} already exists".format(dev_id))
 
-        return id
+        self.__list.append(Device(dev_id))
+
+        return dev_id
 
     def next_id(self):
+        """Get the next available ID in the set"""
 
         if not self.__list:
             return 0
@@ -39,22 +51,24 @@ class Devices():
         candidates = [x for x in range(0, max(nums) + 2) if x not in nums]
         return min(candidates)
 
-    def exists(self, name=None, id=None):
+    def device_exists(self, name=None, dev_id=None):
+        """Check if a device exists"""
         try:
-            self.get(name=name, id=id)
+            self.get_device(name=name, dev_id=dev_id)
         except IndexError:
             return False
         return True
 
-    def get(self, name=None, id=None):
+    def get_device(self, name=None, dev_id=None):
+        """Get a device from the set"""
 
         # Argument checking
-        if not (id is None or name is None):
+        if not (dev_id is None or name is None):
             raise ValueError("Only id or name can be searched at once")
 
         # Processing the actual request
-        if id is not None:
-            tmp = [d for d in self.__list if d.id == id]
+        if dev_id is not None:
+            tmp = [d for d in self.__list if d.id == dev_id]
         elif name is not None:
             tmp = [d for d in self.__list if d.name == name]
         else:
@@ -62,32 +76,38 @@ class Devices():
 
         if not tmp:
             raise IndexError("Could not find device with {}={}".format(
-                'name' if name else 'id', name if name else id))
+                'name' if name else 'id', name if name else dev_id))
         return tmp[0]
 
     def create_bunch(self, num):
+        """
+        Create a lot of devices. Only works if none were defined
+        :param num: How many devices to create
+        :type num: int
+        """
 
-        utils.type_check(num, int, 'num')
         if self.__list:
             raise IndexError("Can only be done on an empty Devices list")
         if num < 1:
             raise ValueError(
                 "Expecting num to be a strictly positive integer")
 
-        for i in range(0, num):
-            self.add()
+        for _ in range(0, num):
+            self.add_device()
 
 
-class Device():
+class Device(object):
+    """
+    Device abstraction for the CRUSH map
+    """
 
-    def __init__(self, id):
+    def __init__(self, device_id):
 
-        if type(id) is not int or id < 0:
+        if not isinstance(device_id, int) or device_id < 0:
             raise ValueError("Expecting id to be a positive integer")
 
-        self.id = id
-        self.name = "osd.{}".format(id)
-        self.is_item_of = []
+        self.id = device_id
+        self.name = "osd.{}".format(device_id)
 
-    def link_bucket(self, bucket):
-        self.is_item_of.append(bucket)
+    def __repr__(self):
+        return "<Device {}>".format(self.name)

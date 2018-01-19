@@ -1,9 +1,14 @@
 
+"""
+Tunables class definition for the CRUSH map
+"""
+
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 
 
-class Tunables():
+class Tunables(object):
+    """Represents a set of tunables in a CRUSH map"""
 
     def __init__(self):
         self.settings = {}
@@ -27,11 +32,13 @@ class Tunables():
         return out
 
     def update_setting(self, name, value):
+        """Change a particular tunable to a value"""
         self.settings.setdefault(name, None)
         self.profile = None
         self.settings[name] = value
 
     def set_profile(self, profile):
+        """Set tunables to some built-in profile"""
 
         if profile in ('legacy', 'argonaut'):
             self.settings = {}

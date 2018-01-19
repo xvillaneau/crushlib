@@ -1,12 +1,22 @@
 
+"""
+Functions for loading a CRUSH map abstraction from a text file
+"""
+
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import re
-from crushlib.crushmap.rules import Rule, Steps
-from crushlib.crushmap.buckets import Bucket
+from . import Rule, Steps, Bucket
 
 
 def parse_raw(crushmap, map_obj):
+    """
+    Load a text CRUSH map into an object
+
+    :param crushmap: Raw CRUSH map text
+    :param map_obj: Object into which the map will be loaded
+    :type map_obj: crushlib.crushmap.CrushMap
+    """
     parsed = _raw_to_dict(crushmap)
     _parse_tunables(map_obj, parsed['tunable'])
     _parse_devices(map_obj, parsed['device'])
@@ -84,7 +94,7 @@ def _parse_devices(map_obj, dev_list):
                              "to be an integer!")
 
         if name == ('osd.{}'.format(num)):
-            map_obj.devices.add(num)
+            map_obj.devices.add_device(num)
 
 
 def _parse_types(map_obj, types_list):
@@ -92,7 +102,7 @@ def _parse_types(map_obj, types_list):
         line = string.split()
 
         try:
-            id = int(line[1])
+            type_id = int(line[1])
             name = line[2]
         except IndexError:
             raise ValueError("Types Parsing error: Type declaration "
@@ -101,12 +111,12 @@ def _parse_types(map_obj, types_list):
             raise ValueError("Type Parsing error: Type ID expected "
                              "to be an integer!")
 
-        map_obj.types.add(name, id)
+        map_obj.types.add_type(name, type_id)
 
 
 def _parse_buckets(crushmap, buckets_list):
 
-    def parse_bucket(bucket_raw):
+    def _parse_bucket(bucket_raw):
         items = []
         for string in bucket_raw:
             line = string.split()
@@ -114,30 +124,30 @@ def _parse_buckets(crushmap, buckets_list):
             value = line[1]
 
             if line[-1] == '{':  # First line: open bucket declaration
-                type_obj = crushmap.types.get(name=head)
+                type_obj = crushmap.types.get_type(name=head)
                 name = value
             elif head == 'item':
                 item = (crushmap.get_item(name=value), float(line[3]))
                 items.append(item)
             elif head == 'id':
-                id = int(value)
+                bucket_id = int(value)
             elif head == 'alg':
                 alg = value
             elif head == 'hash':
                 if value == '0':
-                    hash = 'rjenkins1'
+                    crush_hash = 'rjenkins1'
                 else:
                     raise ValueError("Unknown hash {}".format(value))
             else:
                 raise ValueError("Unknown property {}".format(head))
 
-        bucket = Bucket(name, type_obj, id, alg, hash)
+        bucket = Bucket(name, type_obj, bucket_id, alg, crush_hash)
         for i in items:
             bucket.add_item(i[0], i[1])
         return bucket
 
     for bucket_raw in buckets_list:
-        crushmap.buckets.add(parse_bucket(bucket_raw))
+        crushmap.buckets.add_bucket(_parse_bucket(bucket_raw))
 
 
 def _parse_rules(map_obj, rules_list):
@@ -167,7 +177,7 @@ def _parse_rules(map_obj, rules_list):
                 elif op in ('choose', 'chooseleaf'):
                     scheme = l[2]
                     num = int(l[3])
-                    type_obj = map_obj.types.get(name=l[5])
+                    type_obj = map_obj.types.get_type(name=l[5])
                     steps.add(op, scheme=scheme, num=num, type=type_obj)
                 elif op == 'emit':
                     steps.add(op)
@@ -178,4 +188,4 @@ def _parse_rules(map_obj, rules_list):
 
         rule = Rule(name, ruleset=ruleset, rule_type=rule_type,
                     steps=steps, min_size=min_size, max_size=max_size)
-        map_obj.rules.add(rule)
+        map_obj.rules.add_rule(rule)

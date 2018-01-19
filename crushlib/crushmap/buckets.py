@@ -1,13 +1,16 @@
 
+"""
+Classes for bucket handing in the CRUSH map
+"""
+
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 
 from crushlib import utils
-from crushlib.crushmap.devices import Device
-from crushlib.crushmap.types import Type
+from . import Device, Type
 
 
-class Buckets():
+class Buckets(object):
     """Handles and manages a set of buckets.
     Arguments:
     - types: Types object that keeps track of all types in the map
@@ -17,6 +20,7 @@ class Buckets():
     def __init__(self):
         """Buckets constructor."""
         self.__list = []
+        """:type: list[Bucket]"""
 
     def __str__(self):
         out = ""
@@ -24,7 +28,11 @@ class Buckets():
             out += str(b)
         return out
 
-    def add(self, bucket):
+    def __repr__(self):
+        buckets = ', '.join(repr(b) for b in self.__list)
+        return '<Buckets [{}]>'.format(buckets)
+
+    def add_bucket(self, bucket):
         """Add a bucket object to the set.
         Its ID will be given if not set already."""
         utils.type_check(bucket, Bucket, 'bucket')
@@ -33,9 +41,9 @@ class Buckets():
         if bucket_id is None:
             bucket_id = self.next_id()
 
-        if self.exists(id=bucket_id):
+        if self.bucket_exists(bucket_id=bucket_id):
             raise IndexError("Bucket #{} already exists".format(bucket_id))
-        if self.exists(name=bucket.name):
+        if self.bucket_exists(name=bucket.name):
             raise IndexError("Bucket {} already exists".format(bucket.name))
 
         bucket.id = bucket_id
@@ -50,16 +58,16 @@ class Buckets():
         candidates = [x for x in range(min(ids) - 1, 0) if x not in ids]
         return max(candidates)
 
-    def get(self, name=None, id=None):
+    def get_bucket(self, name=None, bucket_id=None):
         """Returns one or all buckets, searched by name or ID"""
 
         # Argument checking
-        if not (id is None or name is None):
+        if not (bucket_id is None or name is None):
             raise ValueError("Only id or name can be searched at once")
 
         # Processing the actual request
-        if id is not None:
-            tmp = [b for b in self.__list if b.id == id]
+        if bucket_id is not None:
+            tmp = [b for b in self.__list if b.id == bucket_id]
         elif name is not None:
             tmp = [b for b in self.__list if b.name == name]
         else:
@@ -67,19 +75,19 @@ class Buckets():
 
         if not tmp:
             raise IndexError("Could not find bucket with {}={}".format(
-                'name' if name else 'id', name if name else id))
+                'name' if name else 'id', name if name else bucket_id))
         return tmp[0]
 
-    def exists(self, name=None, id=None):
+    def bucket_exists(self, name=None, bucket_id=None):
         """Check if a bucket of a given name exists"""
         try:
-            self.get(name=name, id=id)
+            self.get_bucket(name=name, bucket_id=bucket_id)
         except IndexError:
             return False
         return True
 
 
-class Bucket():
+class Bucket(object):
     """Represents a single bucket, its properties and items. Also keeps track
     of any parent buckets.
     Arguments:
@@ -90,34 +98,33 @@ class Bucket():
     - hash_name: Name of the hash to use (default: rjenkins1)
     """
 
-    def __init__(self, name, type_obj, id=None, alg='straw', hash='rjenkins1'):
+    def __init__(self, name, type_obj, bucket_id=None, alg='straw', crush_hash='rjenkins1'):
 
         utils.type_check(name, str, 'name')
         utils.type_check(type_obj, Type, 'type_obj')
 
-        utils.type_check(id, int, 'id', True)
-        if id is not None and id >= 0:
-            raise ValueError('Expecting id to be a negative integer')
+        utils.type_check(bucket_id, int, 'bucket_id', True)
+        if bucket_id is not None and bucket_id >= 0:
+            raise ValueError('Expecting bucket_id to be a negative integer')
 
         utils.type_check(alg, str, 'alg')
         if alg not in ('uniform', 'list', 'tree', 'straw'):
             raise ValueError("{} is not a valid algorithm".format(alg))
 
-        utils.type_check(hash, str, 'hash')
-        if hash not in ('rjenkins1',):
-            raise ValueError("{} is not a valid hash".format(hash))
+        utils.type_check(crush_hash, str, 'crush_hash')
+        if crush_hash not in ('rjenkins1',):
+            raise ValueError("{} is not a valid hash".format(crush_hash))
 
         self.name = name
-        self.id = id
+        self.id = bucket_id
         self.type = type_obj
         self.alg = alg
-        self.hash = hash
+        self.hash = crush_hash
         self.items = []
-        self.is_item_of = []
 
-        self.type.link_bucket(self)
-
-    # TODO: Destroy handler that un-links bucket to the Type
+    def __repr__(self):
+        return "<Bucket type={} id={} name={} n_items={}>".format(
+            self.type, self.id, self.name, len(self.items))
 
     def __str__(self):
         hash_id = 0  # There is no other possibiloty anyway
@@ -147,18 +154,14 @@ class Bucket():
             item['weight'] = weight
         elif not isinstance(obj, Bucket):
             raise TypeError("item must be a Bucket or a Device")
-        obj.link_bucket(self)
 
         self.items.append(item)
 
-    def weight(self):
+    def weight(self, traversed=None):
         """Returns the total weight of the bucket, all items summed up"""
-        traversed = []
-        return self._weight_recursion(traversed)
 
-    def _weight_recursion(self, traversed):
-        """Recursive function for computing weight.
-        Includes test for loops."""
+        if traversed is None:
+            traversed = []
 
         if self.name in traversed:
             raise ValueError("There is a loop in the bucket hierarchy!")
@@ -170,9 +173,5 @@ class Bucket():
             if isinstance(obj, Device):
                 weight += i['weight']
             else:
-                weight += obj._weight_recursion(traversed)
+                weight += obj.weight(traversed)
         return weight
-
-    def link_bucket(self, bucket):
-        """Used when a parent bucket declares this bucket as item"""
-        self.is_item_of.append(bucket)

@@ -14,51 +14,51 @@ class TestTypes(unittest.TestCase):
         self.types = None
 
     def test_add(self):
-        """Test success path for Types.add()"""
-        self.types.add("host", 0)
-        self.types.add("root", 3)
+        """Test success path for Types.add_type()"""
+        self.types.add_type("host", 0)
+        self.types.add_type("root", 3)
 
     def test_get(self):
-        """Test success path for Types.get()"""
-        self.types.add("host", 0)
-        self.types.add("root", 3)
-        self.assertIsInstance(self.types.get(id=0), Type)
+        """Test success path for Types.get_type()"""
+        self.types.add_type("host", 0)
+        self.types.add_type("root", 3)
+        self.assertIsInstance(self.types.get_type(type_id=0), Type)
 
-        host = self.types.get(id=0)
+        host = self.types.get_type(type_id=0)
         self.assertEqual(host.id, 0)
         self.assertEqual(host.name, 'host')
 
-        host = self.types.get(name='host')
+        host = self.types.get_type(name='host')
         self.assertEqual(host.id, 0)
         self.assertEqual(host.name, 'host')
 
-        self.assertIn(self.types.get(id=3), self.types.get())
+        self.assertIn(self.types.get_type(type_id=3), self.types.get_type())
 
     def test_exists(self):
-        """Test success path for Types.exists()"""
-        self.types.add("root", 3)
-        self.assertTrue(self.types.exists(id=3))
-        self.assertTrue(self.types.exists(name='root'))
-        self.assertFalse(self.types.exists(id=0))
-        self.assertFalse(self.types.exists(name='osd'))
+        """Test success path for Types.type_exists()"""
+        self.types.add_type("root", 3)
+        self.assertTrue(self.types.type_exists(type_id=3))
+        self.assertTrue(self.types.type_exists(name='root'))
+        self.assertFalse(self.types.type_exists(type_id=0))
+        self.assertFalse(self.types.type_exists(name='osd'))
 
     def test_createset(self):
         """Test success path for Types.create_set()"""
         self.types.create_set(['osd', 'host', 'root'])
 
-        t = self.types.get(name='osd')
+        t = self.types.get_type(name='osd')
         self.assertEqual(t.id, 0)
         self.assertEqual(t.name, 'osd')
 
-        t = self.types.get(name='host')
+        t = self.types.get_type(name='host')
         self.assertEqual(t.id, 1)
         self.assertEqual(t.name, 'host')
 
-        t = self.types.get(name='root')
+        t = self.types.get_type(name='root')
         self.assertEqual(t.id, 2)
         self.assertEqual(t.name, 'root')
 
-        self.assertEqual(len(self.types.get()), 3)
+        self.assertEqual(len(self.types.get_type()), 3)
 
     def test_type_init(self):
         Type('test', 0)
@@ -66,41 +66,41 @@ class TestTypes(unittest.TestCase):
             Type('', 0)
 
     def test_add_except(self):
-        """Test exceptions returned by Types.add()"""
+        """Test exceptions returned by Types.add_type()"""
         with self.assertRaises(TypeError):
-            self.types.add(71, 0)
+            self.types.add_type(71, 0)
         with self.assertRaises(TypeError):
-            self.types.add("test", "string")
+            self.types.add_type("test", "string")
         with self.assertRaises(ValueError):
-            self.types.add("", 0)
-        self.types.add('osd', 0)
+            self.types.add_type("", 0)
+        self.types.add_type('osd', 0)
         with self.assertRaises(IndexError):
-            self.types.add('test', 0)
+            self.types.add_type('test', 0)
         with self.assertRaises(IndexError):
-            self.types.add('osd', 1)
+            self.types.add_type('osd', 1)
 
     def test_get_except(self):
-        """Test exceptions returned by Types.get()"""
+        """Test exceptions returned by Types.get_type()"""
         with self.assertRaises(TypeError):
-            self.types.get(name=71)
+            self.types.get_type(name=71)
         with self.assertRaises(TypeError):
-            self.types.get(id="string")
+            self.types.get_type(type_id="string")
         with self.assertRaises(ValueError):
-            self.types.get(name="")
-        self.types.add('osd', 0)
+            self.types.get_type(name="")
+        self.types.add_type('osd', 0)
         with self.assertRaises(ValueError):
-            self.types.get(id=0, name='osd')
+            self.types.get_type(name='osd', type_id=0)
         with self.assertRaises(IndexError):
-            self.types.get(id=1)
+            self.types.get_type(type_id=1)
 
     def test_exists_except(self):
-        """Test exceptions returned by Types.exists()"""
+        """Test exceptions returned by Types.type_exists()"""
         with self.assertRaises(TypeError):
-            self.types.exists(name=71)
+            self.types.type_exists(name=71)
         with self.assertRaises(TypeError):
-            self.types.exists(id="string")
+            self.types.type_exists(type_id="string")
         with self.assertRaises(ValueError):
-            self.types.exists(name="")
+            self.types.type_exists(name="")
 
     def test_createset_except(self):
         """Test exceptions returned by Types.create_set()"""
