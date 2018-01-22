@@ -27,7 +27,7 @@ class Types(object):
         return out
 
     def __repr__(self):
-        types = ', '.join(repr(t) for t in self.__list)
+        types = ', '.join("{}: {}".format(t.id, t.name) for t in self.__list)
         return '<Types [{}]>'.format(types)
 
     def add_type(self, name, type_id):

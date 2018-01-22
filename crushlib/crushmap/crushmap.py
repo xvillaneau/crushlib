@@ -124,3 +124,8 @@ class CrushMap(object):
         crushmap.rules.add_rule(Rule.default(root_item, host_type))
 
         return crushmap
+
+    def rename_bucket(self, old_name, new_name):
+        """Rename a buckets"""
+        b = self.buckets.get_bucket(name=old_name)
+        b.name = new_name

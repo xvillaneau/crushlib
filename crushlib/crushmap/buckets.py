@@ -124,7 +124,7 @@ class Bucket(object):
 
     def __repr__(self):
         return "<Bucket type={} id={} name={} n_items={}>".format(
-            self.type, self.id, self.name, len(self.items))
+            self.type.name, self.id, self.name, len(self.items))
 
     def __str__(self):
         hash_id = 0  # There is no other possibiloty anyway
