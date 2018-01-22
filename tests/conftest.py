@@ -19,3 +19,11 @@ def crushmap_missing_dev(crushmap_empty):
     crush_file = os.path.join(FILES_DIR, 'crushmap_missingdev.txt')
     crushmap_empty.read_file(crush_file)
     yield crushmap_empty
+
+
+@pytest.fixture
+def crushmap(crushmap_empty):
+    """:type crushmap_empty: CrushMap"""
+    crush_file = os.path.join(FILES_DIR, 'crushmap_complete.txt')
+    crushmap_empty.read_file(crush_file)
+    yield crushmap_empty

@@ -47,3 +47,14 @@ class TestCRUSHmap(object):
         assert -3 == c.get_item(name='myroot').id
         with pytest.raises(ValueError):
             CrushMap.create(4, [('root', 2)])
+
+    def test_rename_bucket(self, crushmap):
+
+        with pytest.raises(IndexError):
+            crushmap.rename_bucket('host4', 'host5')
+
+        crushmap.rename_bucket('host3', 'host4')
+        assert crushmap.get_item('host4').name == 'host4'
+
+        with pytest.raises(IndexError):
+            crushmap.get_item('host3')
