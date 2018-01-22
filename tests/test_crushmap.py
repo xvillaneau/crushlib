@@ -58,3 +58,8 @@ class TestCRUSHmap(object):
 
         with pytest.raises(IndexError):
             crushmap.get_item('host3')
+
+    def test_reweight_subtree(self, crushmap):
+        crushmap.reweight_subtree('host1', 2.0)
+        assert all(i['weight'] == 2.0 for i in crushmap.get_item('host1').items)
+        assert crushmap.get_item('root').weight() == 20.0
