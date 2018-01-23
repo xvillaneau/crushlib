@@ -7,7 +7,6 @@ from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 from crushlib import utils
 from crushlib.crushmap.buckets import Bucket
-from crushlib.crushmap.devices import Device
 from crushlib.crushmap.types import Type
 
 
@@ -16,6 +15,7 @@ class Rules(object):
 
     def __init__(self):
         self.__list = []
+        ":type: list[Rule]"
 
     def __str__(self):
         out = ""
@@ -56,7 +56,7 @@ class Rules(object):
         elif name is not None:
             tmp = [i for i in self.__list if i.name == name]
         else:
-            return self.__list
+            raise ValueError("Specify at least one argument")
 
         if not tmp:
             raise IndexError("Could not find rule with {}={}".format(
@@ -86,11 +86,6 @@ class Rule(object):
                  rule_type='replicated', min_size=1, max_size=10):
 
         # Argument checking
-        utils.type_check(rule_name, str, 'rule_name')
-        utils.type_check(ruleset, int, 'ruleset', True)
-        utils.type_check(steps, Steps, 'steps', True)
-        utils.type_check(min_size, int, 'min_size')
-        utils.type_check(max_size, int, 'max_size')
         if rule_type not in ('replicated', 'erasure'):
             raise ValueError("Rule type must be replicated or erasure")
 
@@ -102,6 +97,8 @@ class Rule(object):
 
         if steps is None:
             steps = Steps()
+        elif not steps.is_complete():
+            raise ValueError("Passed sequence of steps is not complete")
         self.steps = steps
 
     def __str__(self):
@@ -118,9 +115,9 @@ class Rule(object):
     def default(root_item, host_type):
         """Create a default replicated rule"""
         steps = Steps()
-        steps.add('take', item=root_item)
-        steps.add('chooseleaf', type=host_type)
-        steps.add('emit')
+        steps.add_step(StepTake(root_item))
+        steps.add_step(StepChoose(host_type, leaf=True))
+        steps.add_step(StepEmit())
         return Rule('replicated_ruleset', steps=steps)
 
 
@@ -129,46 +126,80 @@ class Steps(object):
 
     def __init__(self):
         self.__list = []
+        ":type: list[Step]"
 
     def __str__(self):
-        out = ""
-        for step in self.__list:
-            out += "\tstep {}".format(step["op"])
+        return '\n'.join(str(step) for step in self.__list) + '\n'
 
-            if step["op"] == "take":
-                out += " " + step["item"].name
-            elif step["op"] in ('choose', 'chooseleaf'):
-                out += " {} {} type {}".format(
-                    step["scheme"], step["num"], step["type"].name)
-            out += "\n"
-        return out
+    def __iter__(self):
+        return iter(self.__list)
 
-    def add(self, op, **kwargs):
-        """Add a step to the rule"""
+    def __getitem__(self, item):
+        return self.__list[item]
 
-        utils.type_check(op, str, 'op')
+    def add_step(self, step_obj):
+        """
+        Add a rule to the set of rules
+        :type step_obj: Step
+        """
 
-        if op == 'take':
-            item = kwargs.get("item")
-            if not isinstance(item, (Device, Bucket)):
-                raise TypeError("item must be a Device or a Bucket")
-            self.__list.append({"op": "take", "item": item})
+        take_required = self.is_complete() or not self.__list
+        if take_required != isinstance(step_obj, StepTake):
+            raise ValueError("First step of a sequence MUST be 'take'")
+        self.__list.append(step_obj)
 
-        elif op == 'emit':
-            self.__list.append({"op": "emit"})
+    def is_complete(self):
+        """Tests if a sequence of steps looks correct"""
+        if not self.__list:
+            return False
+        return isinstance(self.__list[-1], StepEmit)
 
-        elif op in ('choose', 'chooseleaf'):
-            num = kwargs.get('num', 0)
-            utils.type_check(num, int, 'num')
 
-            type_obj = kwargs.get('type')
-            utils.type_check(type_obj, Type, 'type')
+class Step(object):
+    """Abstract base class for steps"""
 
-            scheme = kwargs.get('scheme', 'firstn')
-            if scheme not in ('firstn', 'indep'):
-                raise ValueError('scheme should be firstn or indep')
+    name = None
 
-            self.__list.append({'op': op, 'scheme': scheme, 'num': num,
-                                'type': type_obj})
-        else:
-            raise ValueError("Operation {} not recognized".format(op))
+
+class StepTake(Step):
+    """Represents a "take" step"""
+
+    name = 'take'
+
+    def __init__(self, item):
+        assert isinstance(item, Bucket)
+        self.item = item
+        ":type: Bucket"
+
+    def __str__(self):
+        return "\tstep take {}".format(self.item.name)
+
+
+class StepEmit(Step):
+    """Represents an "emit" step"""
+
+    name = 'edit'
+
+    def __str__(self):
+        return "\tstep emit"
+
+
+class StepChoose(Step):
+    """Represents both "choose" and "chooseleaf" steps"""
+
+    def __init__(self, type_obj, leaf=False, num=0, scheme='firstn'):
+        assert isinstance(type_obj, Type)
+        assert scheme in ('firstn', 'indep')
+        self.type = type_obj
+        self.leaf = leaf
+        self.num = num
+        self.scheme = scheme
+
+    def __str__(self):
+        return "\tstep choose{} {} {} type {}".format(
+            "leaf" if self.leaf else "", self.scheme, self.num, self.type.name)
+
+    @property
+    def name(self):
+        """Name of the rule. Depends on the leaf"""
+        return 'chooseleaf' if self.leaf else 'choose'

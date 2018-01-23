@@ -1,104 +1,97 @@
 
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
-import unittest
 
-from crushlib.crushmap import CrushMap
-from crushlib.crushmap.rules import Steps, Rule
-from crushlib.crushmap.buckets import Bucket
+import pytest
+
+from crushlib.crushmap import CrushMap, Rule, Steps
+from crushlib.crushmap.rules import StepTake, StepChoose, StepEmit
 
 
-class TestRules(unittest.TestCase):
+class TestRules(object):
 
-    def setUp(self):
-        self.crushmap = CrushMap()
-        self.crushmap.devices.create_bunch(4)
-        self.crushmap.types.create_set(['osd', 'host', 'root'])
-
-        host0 = Bucket('host0', self.crushmap.types.get_type('host'))
-        host0.add_item(self.crushmap.get_item('osd.0'))
-        host0.add_item(self.crushmap.get_item('osd.1'))
-        self.crushmap.buckets.add_bucket(host0)
-
-        host1 = Bucket('host1', self.crushmap.types.get_type('host'))
-        host1.add_item(self.crushmap.get_item('osd.2'))
-        host1.add_item(self.crushmap.get_item('osd.3'))
-        self.crushmap.buckets.add_bucket(host1)
-
-        root = Bucket('root', self.crushmap.types.get_type('root'))
-        root.add_item(host0)
-        root.add_item(host1)
-        self.crushmap.buckets.add_bucket(root)
-
-    def tearDown(self):
-        self.crushmap = None
-
-    def test_rules_add(self):
+    def test_rules_add(self, crushmap):
         r = Rule('test')
-        self.crushmap.rules.add_rule(r)
+        crushmap.rules.add_rule(r)
 
         rf1 = Rule('fail', ruleset=-1)
-        with self.assertRaises(ValueError):
-            self.crushmap.rules.add_rule(rf1)
+        with pytest.raises(ValueError):
+            crushmap.rules.add_rule(rf1)
         rf2 = Rule('fail', ruleset=0)
-        with self.assertRaises(IndexError):
-            self.crushmap.rules.add_rule(rf2)
+        with pytest.raises(IndexError):
+            crushmap.rules.add_rule(rf2)
         rf3 = Rule('test')
-        with self.assertRaises(IndexError):
-            self.crushmap.rules.add_rule(rf3)
+        with pytest.raises(IndexError):
+            crushmap.rules.add_rule(rf3)
 
-    def test_rules_get(self):
-        self.test_rules_add()
+    def test_rules_get(self, crushmap):
 
-        r = self.crushmap.rules.get_rule(name='test')
-        self.assertIsInstance(r, Rule)
-        self.assertEqual(r.id, 0)
+        r = crushmap.rules.get_rule(name='replicated_ruleset')
+        assert isinstance(r, Rule)
+        assert 0 == r.id
 
-        r = self.crushmap.rules.get_rule(rule_id=0)
-        self.assertIsInstance(r, Rule)
-        self.assertEqual(r.name, 'test')
+        r = crushmap.rules.get_rule(rule_id=0)
+        assert isinstance(r, Rule)
+        assert 'replicated_ruleset' == r.name
 
-        l = self.crushmap.rules.get_rule()
-        self.assertIsInstance(l, list)
-        self.assertIsInstance(l[0], Rule)
+        with pytest.raises(ValueError):
+            crushmap.rules.get_rule()
+        with pytest.raises(ValueError):
+            crushmap.rules.get_rule(rule_id=0, name='test')
 
-        with self.assertRaises(ValueError):
-            self.crushmap.rules.get_rule(rule_id=0, name='test')
-        with self.assertRaises(IndexError):
-            self.crushmap.rules.get_rule(name='testABC')
-        with self.assertRaises(IndexError):
-            self.crushmap.rules.get_rule(rule_id=71)
+        with pytest.raises(IndexError):
+            crushmap.rules.get_rule(name='testABC')
+        with pytest.raises(IndexError):
+            crushmap.rules.get_rule(rule_id=71)
 
     def test_rule_init(self):
         Rule('test')
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             Rule('test', rule_type='test')
 
-    def test_rule_default(self):
-        root_item = self.crushmap.get_item('root')
-        host_type = self.crushmap.types.get_type('host')
+    def test_rule_default(self, crushmap):
+        root_item = crushmap.get_item('root')
+        host_type = crushmap.types.get_type('host')
         r = Rule.default(root_item, host_type)
-        self.assertIsInstance(r, Rule)
-        self.assertEqual(r.name, 'replicated_ruleset')
-        self.assertEqual(r.type, 'replicated')
+        assert isinstance(r, Rule)
+        assert 'replicated_ruleset' == r.name
+        assert 'replicated' == r.type
 
-    def test_steps_add(self):
+    def test_steps_add(self, crushmap):
+        """:type crushmap: CrushMap"""
+
+        root = crushmap.get_item('root')
+        host_type = crushmap.types.get_type('host')
+        take = StepTake(item=root)
+        choose = StepChoose(host_type)
+        emit = StepEmit()
+
         steps = Steps()
 
-        root = self.crushmap.get_item('root')
-        steps.add('take', item=root)
-        with self.assertRaises(TypeError):
-            steps.add('take', item='test')
+        with pytest.raises(ValueError):
+            steps.add_step(emit)
+        with pytest.raises(ValueError):
+            steps.add_step(choose)
 
-        t = self.crushmap.types.get_type('host')
-        steps.add('choose', scheme='firstn', num=0, type=t)
-        steps.add('choose', scheme='indep', num=2, type=t)
-        steps.add('chooseleaf', scheme='firstn', num=-1, type=t)
-        with self.assertRaises(ValueError):
-            steps.add('choose', scheme='test', type=t)
+        steps.add_step(take)
+        steps.add_step(choose)
 
-        steps.add('emit')
+        with pytest.raises(ValueError):
+            steps.add_step(take)
 
-        with self.assertRaises(ValueError):
-            steps.add('test')
+        steps.add_step(emit)
+
+        with pytest.raises(ValueError):
+            steps.add_step(emit)
+        with pytest.raises(ValueError):
+            steps.add_step(choose)
+
+        steps.add_step(take)
+
+        with pytest.raises(ValueError):
+            Rule('test', steps=steps)
+
+        steps.add_step(choose)
+        steps.add_step(emit)
+        Rule('test', steps=steps)

@@ -7,6 +7,7 @@ from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import re
 from . import Rule, Steps, Bucket
+from .rules import StepTake, StepChoose, StepEmit
 
 
 def parse_raw(crushmap, map_obj):
@@ -173,14 +174,16 @@ def _parse_rules(map_obj, rules_list):
                 op = value
                 if op == 'take':
                     item = map_obj.get_item(name=l[2])
-                    steps.add(op, item=item)
+                    steps.add_step(StepTake(item))
                 elif op in ('choose', 'chooseleaf'):
                     scheme = l[2]
                     num = int(l[3])
+                    leaf = op == 'chooseleaf'
                     type_obj = map_obj.types.get_type(name=l[5])
-                    steps.add(op, scheme=scheme, num=num, type=type_obj)
+                    step = StepChoose(type_obj, leaf=leaf, scheme=scheme, num=num)
+                    steps.add_step(step)
                 elif op == 'emit':
-                    steps.add(op)
+                    steps.add_step(StepEmit())
                 else:
                     raise ValueError("Unknown operation {}".format(op))
             else:
