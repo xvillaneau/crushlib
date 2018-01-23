@@ -118,3 +118,9 @@ class TestTypes(object):
         types.create_set(['osd', 'host', 'root'])
         with pytest.raises(IndexError):
             types.create_set([])
+
+    def test_types_repr(self):
+        types = Types()
+        types.create_set(['osd', 'host', 'root'])
+        assert repr(types) == '<Types [0: osd, 1: host, 2: root]>'
+        assert repr(types.get_type('osd')) == '<Type name=osd id=0>'
