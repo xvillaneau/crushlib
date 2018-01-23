@@ -6,7 +6,7 @@ from __future__ import absolute_import, division, \
 
 import math
 from .parser import parse_raw
-from . import Tunables, Devices, Types, Bucket, Buckets, Rule, Rules, Device
+from . import Tunables, Devices, Types, Bucket, Buckets, Rule, Rules
 
 
 class CrushMap(object):
@@ -146,15 +146,5 @@ class CrushMap(object):
 
     def reweight_subtree(self, bucket_name, item_weight):
         """Reweight all OSDs of a bucket"""
-
-        def _iter_reweight(bucket):
-            """:type bucket: Bucket"""
-            for i in bucket.items:
-                obj = i['obj']
-                if isinstance(obj, Device):
-                    i['weight'] = item_weight
-                else:
-                    _iter_reweight(obj)
-
         b = self.get_item(bucket_name)
-        _iter_reweight(b)
+        b.reweight_devices(item_weight)
