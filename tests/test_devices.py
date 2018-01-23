@@ -2,7 +2,7 @@
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import pytest
-from crushlib.crushmap.devices import Devices
+from crushlib.crushmap.devices import Devices, Device
 
 
 class TestDevices(object):
@@ -61,3 +61,12 @@ class TestDevices(object):
 
         with pytest.raises(IndexError):
             dev.create_bunch(212)
+
+    def test_devices_repr(self):
+
+        dev = Device(0)
+        assert repr(dev) == "<Device osd.0>"
+
+        devs = Devices()
+        devs.create_bunch(10)
+        assert repr(devs) == "<Devices count=10>"
