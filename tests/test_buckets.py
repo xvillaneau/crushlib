@@ -32,6 +32,18 @@ class TestBuckets(object):
             crushmap.buckets.add_bucket(
                 Bucket('root2', crushmap.types.get_type('root'), bucket_id=-3))
 
+    def test_buckets_add_missing_child(self, crushmap):
+
+        host_type = crushmap.types.get_type('host')
+        psu_type = crushmap.types.get_type('psu')
+
+        b_child = Bucket('test_host', host_type)
+        b_parent = Bucket('test_psu', psu_type)
+        b_parent.add_item(b_child)
+
+        with pytest.raises(IndexError):
+            crushmap.buckets.add_bucket(b_parent)
+
     def test_buckets_get(self, crushmap):
         """:type crushmap: CrushMap"""
 
@@ -53,6 +65,11 @@ class TestBuckets(object):
             crushmap.buckets.get_bucket(name='testABC')
         with pytest.raises(IndexError):
             crushmap.buckets.get_bucket(bucket_id=-71)
+
+    def test_buckets_repr(self, crushmap):
+        """:type crushmap: CrushMap"""
+        assert repr(crushmap.buckets).startswith('<Buckets [')
+        assert repr(crushmap.buckets).endswith(']>')
 
     def test_buckets_nextid_empty(self, crushmap_empty):
         """Test for Buckets.next_id()"""
