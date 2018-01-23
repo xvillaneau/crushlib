@@ -30,6 +30,9 @@ class Types(object):
         types = ', '.join("{}: {}".format(t.id, t.name) for t in self.__list)
         return '<Types [{}]>'.format(types)
 
+    def __iter__(self):
+        return iter(self.__list)
+
     def add_type(self, name, type_id):
         """Add a new type to the CRUSH map"""
 

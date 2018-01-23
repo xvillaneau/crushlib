@@ -23,6 +23,9 @@ class Rules(object):
             out += str(rule)
         return out
 
+    def __iter__(self):
+        return iter(self.__list)
+
     def add_rule(self, rule):
         """Add a rule to the set"""
 
