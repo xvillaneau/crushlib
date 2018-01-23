@@ -107,6 +107,12 @@ class Types(object):
         obj = self.get_type(name=name)
         obj.id = new_id
 
+    def remove_type(self, name):
+        """WARNING: it is assumed that no bucket is using this type.
+        Use the CrushMap.remove_type method instead!!!"""
+        obj = self.get_type(name=name)
+        self.__list.remove(obj)
+
 
 class Type(object):
     """

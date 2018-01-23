@@ -77,6 +77,19 @@ class TestCRUSHmap(object):
         with pytest.raises(ValueError):
             crushmap.move_type('root', -1)
 
+    def test_remove_type(self, crushmap):
+        """:type crushmap: CrushMap"""
+
+        crushmap.types.add_type('test', 4)
+        crushmap.remove_type('test')
+        with pytest.raises(IndexError):
+            crushmap.types.get_type('test')
+
+        with pytest.raises(IndexError):
+            crushmap.remove_type('pod')
+        with pytest.raises(ValueError):
+            crushmap.remove_type('root')
+
     def test_rename_bucket(self, crushmap):
 
         with pytest.raises(IndexError):
