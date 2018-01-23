@@ -95,3 +95,12 @@ class TestRules(object):
         steps.add_step(choose)
         steps.add_step(emit)
         Rule('test', steps=steps)
+
+    def test_step_names(self, crushmap):
+        item = crushmap.get_item('root')
+        host = crushmap.types.get_type('host')
+
+        assert StepTake(item).name == 'take'
+        assert StepEmit().name == 'emit'
+        assert StepChoose(host).name == 'choose'
+        assert StepChoose(host, leaf=True).name == 'chooseleaf'
