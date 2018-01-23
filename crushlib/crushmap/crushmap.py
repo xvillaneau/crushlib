@@ -6,7 +6,8 @@ from __future__ import absolute_import, division, \
 
 import math
 from .parser import parse_raw
-from . import Tunables, Devices, Types, Bucket, Buckets, Rule, Rules
+from . import Tunables, Devices, Types, Bucket, Buckets
+from .rules import StepTake, Rule, Rules
 
 
 class CrushMap(object):
@@ -174,3 +175,19 @@ class CrushMap(object):
         """Reweight all OSDs of a bucket"""
         b = self.get_item(bucket_name)
         b.reweight_devices(item_weight)
+
+    def edit_rule_root(self, rule_name, new_root_name):
+        """
+        Change the root (i.e. the bucket in the 'take' step) of a rule
+
+        WARNING: Can reshuffle the data! Be careful, simulate the change first.
+        """
+
+        rule = self.rules.get_rule(rule_name)
+        root = self.buckets.get_bucket(new_root_name)
+
+        take_steps = [s for s in rule.steps if isinstance(s, StepTake)]
+        if len(take_steps) != 1:
+            raise ValueError("Can only edit rules with only one 'take' step")
+        take = take_steps[0]
+        take.item = root

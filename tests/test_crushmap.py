@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, \
 import os
 import pytest
 
-from crushlib.crushmap import CrushMap, Type, Bucket
+from crushlib.crushmap import CrushMap, Type, Bucket, Rule
 
 FILES_DIR = os.path.join(os.path.dirname(__file__), 'files')
 
@@ -140,3 +140,18 @@ class TestCRUSHmap(object):
         crushmap.reweight_subtree('host1', 2.0)
         assert all(w == 2.0 for w in crushmap.get_item('host1').items.values())
         assert crushmap.get_item('root').weight() == 20.0
+
+    def test_edit_rule_root(self, crushmap):
+        """:type crushmap: CrushMap"""
+        crushmap.edit_rule_root('replicated_ruleset', 'psu0')
+        assert crushmap.rules.get_rule('replicated_ruleset').steps[0].item.name == 'psu0'
+
+        with pytest.raises(IndexError):
+            crushmap.edit_rule_root('test', 'psu0')
+        with pytest.raises(IndexError):
+            crushmap.edit_rule_root('replicated_ruleset', 'psu2')
+
+        r = Rule('test')
+        crushmap.rules.add_rule(r)
+        with pytest.raises(ValueError):
+            crushmap.edit_rule_root('test', 'psu0')

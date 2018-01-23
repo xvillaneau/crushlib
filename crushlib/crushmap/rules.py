@@ -15,6 +15,7 @@ class Rules(object):
 
     def __init__(self):
         self.__list = []
+        ":type: list[Rule]"
 
     def __str__(self):
         out = ""
@@ -130,6 +131,12 @@ class Steps(object):
     def __str__(self):
         return '\n'.join(str(step) for step in self.__list) + '\n'
 
+    def __iter__(self):
+        return iter(self.__list)
+
+    def __getitem__(self, item):
+        return self.__list[item]
+
     def add_step(self, step_obj):
         """
         Add a rule to the set of rules
@@ -151,9 +158,13 @@ class Steps(object):
 class Step(object):
     """Abstract base class for steps"""
 
+    name = None
+
 
 class StepTake(Step):
     """Represents a "take" step"""
+
+    name = 'take'
 
     def __init__(self, item):
         assert isinstance(item, Bucket)
@@ -166,6 +177,8 @@ class StepTake(Step):
 
 class StepEmit(Step):
     """Represents an "emit" step"""
+
+    name = 'edit'
 
     def __str__(self):
         return "\tstep emit"
@@ -185,3 +198,8 @@ class StepChoose(Step):
     def __str__(self):
         return "\tstep choose{} {} {} type {}".format(
             "leaf" if self.leaf else "", self.scheme, self.num, self.type.name)
+
+    @property
+    def name(self):
+        """Name of the rule. Depends on the leaf"""
+        return 'chooseleaf' if self.leaf else 'choose'
