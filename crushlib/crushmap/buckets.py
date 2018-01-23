@@ -32,6 +32,9 @@ class Buckets(object):
         buckets = ', '.join(repr(b) for b in self.__list)
         return '<Buckets [{}]>'.format(buckets)
 
+    def __iter__(self):
+        return iter(self.__list)
+
     def add_bucket(self, bucket):
         """Add a bucket object to the set.
         Its ID will be given if not set already."""

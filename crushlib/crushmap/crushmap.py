@@ -125,6 +125,20 @@ class CrushMap(object):
 
         return crushmap
 
+    def rename_type(self, old_name, new_name):
+        """Rename a type"""
+        self.types.rename_type(old_name, new_name)
+
+    def move_type(self, name, new_id):
+        """Change the ID of a type"""
+        self.types.move_type(name, new_id)
+
+    def remove_type(self, name):
+        """Remove an unused type"""
+        if any(b.type.name == name for b in self.buckets):
+            raise ValueError("Type {} is still in use".format(self.types))
+        self.types.remove_type(name)
+
     def rename_bucket(self, old_name, new_name):
         """Rename a buckets"""
         b = self.buckets.get_bucket(name=old_name)

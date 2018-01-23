@@ -48,6 +48,48 @@ class TestCRUSHmap(object):
         with pytest.raises(ValueError):
             CrushMap.create(4, [('root', 2)])
 
+    def test_rename_type(self, crushmap):
+        """:type crushmap: CrushMap"""
+
+        crushmap.rename_type('psu', 'zone')
+        assert crushmap.types.get_type(type_id=2).name == 'zone'
+        assert crushmap.buckets.get_bucket('psu0').type.name == 'zone'
+
+        with pytest.raises(IndexError):
+            crushmap.rename_type('psu', 'pod')
+
+        with pytest.raises(ValueError):
+            crushmap.rename_type('zone', 'root')
+
+    def test_move_type(self, crushmap):
+        """:type crushmap: CrushMap"""
+
+        crushmap.move_type('root', 4)
+        assert crushmap.types.get_type(type_id=4).name == 'root'
+        assert crushmap.buckets.get_bucket('root').type.id == 4
+        with pytest.raises(IndexError):
+            crushmap.types.get_type(type_id=3)
+
+        with pytest.raises(IndexError):
+            crushmap.move_type('pod', 3)
+        with pytest.raises(ValueError):
+            crushmap.move_type('root', 2)
+        with pytest.raises(ValueError):
+            crushmap.move_type('root', -1)
+
+    def test_remove_type(self, crushmap):
+        """:type crushmap: CrushMap"""
+
+        crushmap.types.add_type('test', 4)
+        crushmap.remove_type('test')
+        with pytest.raises(IndexError):
+            crushmap.types.get_type('test')
+
+        with pytest.raises(IndexError):
+            crushmap.remove_type('pod')
+        with pytest.raises(ValueError):
+            crushmap.remove_type('root')
+
     def test_rename_bucket(self, crushmap):
 
         with pytest.raises(IndexError):
