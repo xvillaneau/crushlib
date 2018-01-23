@@ -129,6 +129,10 @@ class CrushMap(object):
         """Rename a type"""
         self.types.rename_type(old_name, new_name)
 
+    def move_type(self, name, new_id):
+        """Change the ID of a type"""
+        self.types.move_type(name, new_id)
+
     def rename_bucket(self, old_name, new_name):
         """Rename a buckets"""
         b = self.buckets.get_bucket(name=old_name)

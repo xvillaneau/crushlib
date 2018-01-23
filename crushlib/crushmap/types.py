@@ -98,6 +98,15 @@ class Types(object):
         obj = self.get_type(name=old_name)
         obj.name = new_name
 
+    def move_type(self, name, new_id):
+        """Change the ID of a type in the collection"""
+        if new_id < 0:
+            raise ValueError("Invalid type ID {}".format(new_id))
+        if any(t.id == new_id for t in self.__list):
+            raise ValueError("Type id={} already exists".format(new_id))
+        obj = self.get_type(name=name)
+        obj.id = new_id
+
 
 class Type(object):
     """

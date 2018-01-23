@@ -61,6 +61,22 @@ class TestCRUSHmap(object):
         with pytest.raises(ValueError):
             crushmap.rename_type('zone', 'root')
 
+    def test_move_type(self, crushmap):
+        """:type crushmap: CrushMap"""
+
+        crushmap.move_type('root', 4)
+        assert crushmap.types.get_type(type_id=4).name == 'root'
+        assert crushmap.buckets.get_bucket('root').type.id == 4
+        with pytest.raises(IndexError):
+            crushmap.types.get_type(type_id=3)
+
+        with pytest.raises(IndexError):
+            crushmap.move_type('pod', 3)
+        with pytest.raises(ValueError):
+            crushmap.move_type('root', 2)
+        with pytest.raises(ValueError):
+            crushmap.move_type('root', -1)
+
     def test_rename_bucket(self, crushmap):
 
         with pytest.raises(IndexError):
