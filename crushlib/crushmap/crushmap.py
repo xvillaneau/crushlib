@@ -125,6 +125,10 @@ class CrushMap(object):
 
         return crushmap
 
+    def rename_type(self, old_name, new_name):
+        """Rename a type"""
+        self.types.rename_type(old_name, new_name)
+
     def rename_bucket(self, old_name, new_name):
         """Rename a buckets"""
         b = self.buckets.get_bucket(name=old_name)

@@ -91,6 +91,13 @@ class Types(object):
         for t in type_list:
             self.add_type(t, type_list.index(t))
 
+    def rename_type(self, old_name, new_name):
+        """Rename a type in the collection"""
+        if any(t.name == new_name for t in self.__list):
+            raise ValueError("Type {} already exists".format(new_name))
+        obj = self.get_type(name=old_name)
+        obj.name = new_name
+
 
 class Type(object):
     """
