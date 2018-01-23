@@ -90,6 +90,40 @@ class TestCRUSHmap(object):
         with pytest.raises(ValueError):
             crushmap.remove_type('root')
 
+    def test_add_bucket(self, crushmap):
+        """:type crushmap: CrushMap"""
+
+        crushmap.add_bucket('psu2', 'psu', 'root')
+        psu2 = crushmap.get_item('psu2')
+        assert psu2 in crushmap.get_item('root').items
+        assert crushmap.get_item('root').items[psu2] == 0.0
+        assert psu2.type.name == 'psu'
+
+        with pytest.raises(ValueError):
+            crushmap.add_bucket('psu2', 'psu', 'root')
+        with pytest.raises(IndexError):
+            crushmap.add_bucket('psu3', 'psu', 'default')
+        with pytest.raises(IndexError):
+            crushmap.add_bucket('psu3', 'pod', 'root')
+
+    def test_move_bucket(self, crushmap):
+        """:type crushmap: CrushMap"""
+
+        host2 = crushmap.buckets.get_bucket('host2')
+        psu0 = crushmap.buckets.get_bucket('psu0')
+        psu1 = crushmap.buckets.get_bucket('psu1')
+
+        crushmap.move_bucket('host2', 'psu0')
+        assert host2 not in psu1.items
+        assert host2 in psu0.items
+        assert psu0.items[host2] == 4.0
+        assert psu0.weight() == 12.0
+
+        with pytest.raises(IndexError):
+            crushmap.move_bucket('host4', 'psu0')
+        with pytest.raises(IndexError):
+            crushmap.move_bucket('host3', 'psu2')
+
     def test_rename_bucket(self, crushmap):
 
         with pytest.raises(IndexError):
@@ -102,6 +136,7 @@ class TestCRUSHmap(object):
             crushmap.get_item('host3')
 
     def test_reweight_subtree(self, crushmap):
+        """:type crushmap: CrushMap"""
         crushmap.reweight_subtree('host1', 2.0)
-        assert all(i['weight'] == 2.0 for i in crushmap.get_item('host1').items)
+        assert all(w == 2.0 for w in crushmap.get_item('host1').items.values())
         assert crushmap.get_item('root').weight() == 20.0

@@ -111,3 +111,6 @@ class Device(object):
 
     def __repr__(self):
         return "<Device {}>".format(self.name)
+
+    def __hash__(self):
+        return hash(self.name)

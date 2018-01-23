@@ -6,7 +6,7 @@ from __future__ import absolute_import, division, \
 
 import math
 from .parser import parse_raw
-from . import Tunables, Devices, Types, Bucket, Buckets, Rule, Rules, Device
+from . import Tunables, Devices, Types, Bucket, Buckets, Rule, Rules
 
 
 class CrushMap(object):
@@ -139,6 +139,32 @@ class CrushMap(object):
             raise ValueError("Type {} is still in use".format(self.types))
         self.types.remove_type(name)
 
+    def add_bucket(self, name, type_name, parent_name=None):
+        """Add an empty bucket to the CRUSH map"""
+
+        if self.buckets.bucket_exists(name):
+            raise ValueError("Bucket {} already exists".format(name))
+        if not (parent_name is None or self.buckets.bucket_exists(parent_name)):
+            raise IndexError("Parent bucket {} not found".format(parent_name))
+
+        type_obj = self.types.get_type(type_name)
+        bucket = Bucket(name, type_obj)
+        self.buckets.add_bucket(bucket)
+
+        if parent_name is not None:
+            parent = self.buckets.get_bucket(parent_name)
+            parent.items[bucket] = 0.0
+
+    def move_bucket(self, name, parent_name):
+        """Move a bucket under another one"""
+        bucket = self.buckets.get_bucket(name)
+        parent = self.buckets.get_bucket(parent_name)
+        old_parent = next(b for b in self.buckets if bucket in b.items)
+
+        old_parent.items.pop(bucket)
+        parent.items[bucket] = 0.0
+        parent.items[bucket] = bucket.weight()  # Tests for loops
+
     def rename_bucket(self, old_name, new_name):
         """Rename a buckets"""
         b = self.buckets.get_bucket(name=old_name)
@@ -146,15 +172,5 @@ class CrushMap(object):
 
     def reweight_subtree(self, bucket_name, item_weight):
         """Reweight all OSDs of a bucket"""
-
-        def _iter_reweight(bucket):
-            """:type bucket: Bucket"""
-            for i in bucket.items:
-                obj = i['obj']
-                if isinstance(obj, Device):
-                    i['weight'] = item_weight
-                else:
-                    _iter_reweight(obj)
-
         b = self.get_item(bucket_name)
-        _iter_reweight(b)
+        b.reweight_devices(item_weight)
