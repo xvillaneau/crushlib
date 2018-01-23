@@ -106,6 +106,24 @@ class TestCRUSHmap(object):
         with pytest.raises(IndexError):
             crushmap.add_bucket('psu3', 'pod', 'root')
 
+    def test_move_bucket(self, crushmap):
+        """:type crushmap: CrushMap"""
+
+        host2 = crushmap.buckets.get_bucket('host2')
+        psu0 = crushmap.buckets.get_bucket('psu0')
+        psu1 = crushmap.buckets.get_bucket('psu1')
+
+        crushmap.move_bucket('host2', 'psu0')
+        assert host2 not in psu1.items
+        assert host2 in psu0.items
+        assert psu0.items[host2] == 4.0
+        assert psu0.weight() == 12.0
+
+        with pytest.raises(IndexError):
+            crushmap.move_bucket('host4', 'psu0')
+        with pytest.raises(IndexError):
+            crushmap.move_bucket('host3', 'psu2')
+
     def test_rename_bucket(self, crushmap):
 
         with pytest.raises(IndexError):

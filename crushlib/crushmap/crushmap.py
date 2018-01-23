@@ -155,6 +155,16 @@ class CrushMap(object):
             parent = self.buckets.get_bucket(parent_name)
             parent.items[bucket] = 0.0
 
+    def move_bucket(self, name, parent_name):
+        """Move a bucket under another one"""
+        bucket = self.buckets.get_bucket(name)
+        parent = self.buckets.get_bucket(parent_name)
+        old_parent = next(b for b in self.buckets if bucket in b.items)
+
+        old_parent.items.pop(bucket)
+        parent.items[bucket] = 0.0
+        parent.items[bucket] = bucket.weight()  # Tests for loops
+
     def rename_bucket(self, old_name, new_name):
         """Rename a buckets"""
         b = self.buckets.get_bucket(name=old_name)
