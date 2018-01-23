@@ -139,6 +139,22 @@ class CrushMap(object):
             raise ValueError("Type {} is still in use".format(self.types))
         self.types.remove_type(name)
 
+    def add_bucket(self, name, type_name, parent_name=None):
+        """Add an empty bucket to the CRUSH map"""
+
+        if self.buckets.bucket_exists(name):
+            raise ValueError("Bucket {} already exists".format(name))
+        if not (parent_name is None or self.buckets.bucket_exists(parent_name)):
+            raise IndexError("Parent bucket {} not found".format(parent_name))
+
+        type_obj = self.types.get_type(type_name)
+        bucket = Bucket(name, type_obj)
+        self.buckets.add_bucket(bucket)
+
+        if parent_name is not None:
+            parent = self.buckets.get_bucket(parent_name)
+            parent.items[bucket] = 0.0
+
     def rename_bucket(self, old_name, new_name):
         """Rename a buckets"""
         b = self.buckets.get_bucket(name=old_name)

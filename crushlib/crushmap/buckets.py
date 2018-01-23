@@ -50,6 +50,8 @@ class Buckets(object):
             raise IndexError("Bucket #{} already exists".format(bucket_id))
         if self.bucket_exists(name=bucket.name):
             raise IndexError("Bucket {} already exists".format(bucket.name))
+        if not all(b in self.__list for b in bucket.items if isinstance(b, Bucket)):
+            raise IndexError("Items of the new bucket must already exist")
 
         bucket.id = bucket_id
         self.__list.append(bucket)

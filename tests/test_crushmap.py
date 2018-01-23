@@ -90,6 +90,22 @@ class TestCRUSHmap(object):
         with pytest.raises(ValueError):
             crushmap.remove_type('root')
 
+    def test_add_bucket(self, crushmap):
+        """:type crushmap: CrushMap"""
+
+        crushmap.add_bucket('psu2', 'psu', 'root')
+        psu2 = crushmap.get_item('psu2')
+        assert psu2 in crushmap.get_item('root').items
+        assert crushmap.get_item('root').items[psu2] == 0.0
+        assert psu2.type.name == 'psu'
+
+        with pytest.raises(ValueError):
+            crushmap.add_bucket('psu2', 'psu', 'root')
+        with pytest.raises(IndexError):
+            crushmap.add_bucket('psu3', 'psu', 'default')
+        with pytest.raises(IndexError):
+            crushmap.add_bucket('psu3', 'pod', 'root')
+
     def test_rename_bucket(self, crushmap):
 
         with pytest.raises(IndexError):
