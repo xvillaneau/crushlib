@@ -1,65 +1,72 @@
 
 from __future__ import absolute_import, division, \
                        print_function, unicode_literals
-import unittest
-from crushlib.crushmap.devices import Devices
+import pytest
+from crushlib.crushmap.devices import Devices, Device
 
 
-class TestDevices(unittest.TestCase):
-
-    def setUp(self):
-        self.dev = Devices()
-
-    def tearDown(self):
-        self.dev = None
+class TestDevices(object):
 
     def test_devices_add(self):
         """Test Devices.add_device()"""
-        self.assertEqual(self.dev.add_device(), 0)
-        self.assertEqual(self.dev.add_device(2), 2)
+        dev = Devices()
 
-        with self.assertRaises(ValueError):
-            self.dev.add_device(-1)
-        with self.assertRaises(IndexError):
-            self.dev.add_device(2)
+        assert 0 == dev.add_device()
+        assert 2 == dev.add_device(2)
 
-    def test_devices_get(self):
+        with pytest.raises(ValueError):
+            dev.add_device(-1)
+        with pytest.raises(IndexError):
+            dev.add_device(2)
+
+    def test_devices_get(self, crushmap):
         """Test Devices.get_device()"""
-        self.test_devices_add()
-        self.assertEqual(self.dev.get_device(dev_id=2).name, 'osd.2')
-        self.assertEqual(self.dev.get_device(name='osd.0').id, 0)
 
-        with self.assertRaises(ValueError):
-            self.dev.get_device(dev_id=0, name='osd.0')
-        with self.assertRaises(IndexError):
-            self.dev.get_device(dev_id=1)
+        assert 'osd.2' == crushmap.devices.get_device(dev_id=2).name
+        assert 0 == crushmap.devices.get_device(name='osd.0').id
 
-    def test_devices_exists(self):
+        with pytest.raises(ValueError):
+            crushmap.devices.get_device(dev_id=0, name='osd.0')
+        with pytest.raises(IndexError):
+            crushmap.devices.get_device(dev_id=71)
+
+    def test_devices_exists(self, crushmap):
         """Test Devices.device_exists()"""
-        self.test_devices_add()
-        self.assertTrue(self.dev.device_exists(dev_id=2))
-        self.assertTrue(self.dev.device_exists(name='osd.0'))
-        self.assertFalse(self.dev.device_exists(dev_id=1))
-        self.assertFalse(self.dev.device_exists(name='testABC'))
+
+        assert crushmap.devices.device_exists(dev_id=2) is True
+        assert crushmap.devices.device_exists(name='osd.0') is True
+        assert crushmap.devices.device_exists(dev_id=71) is False
+        assert crushmap.devices.device_exists(name='testABC') is False
 
     def test_devices_nextid(self):
         """Test Devices.next_id()"""
-        self.assertEqual(self.dev.next_id(), 0)
-        self.test_devices_add()
-        self.assertEqual(self.dev.next_id(), 1)
-        self.dev.add_device()
-        self.assertEqual(self.dev.next_id(), 3)
+        dev = Devices()
+        assert 0 == dev.next_id()
+        dev.add_device(1)
+        assert 0 == dev.next_id()
+        dev.add_device()
+        assert 2 == dev.next_id()
 
     def test_devices_createbunch(self):
         """Test Devices.create_bunch()"""
+        dev = Devices()
 
-        with self.assertRaises(ValueError):
-            self.dev.create_bunch(0)
-        with self.assertRaises(ValueError):
-            self.dev.create_bunch(-167)
+        with pytest.raises(ValueError):
+            dev.create_bunch(0)
+        with pytest.raises(ValueError):
+            dev.create_bunch(-167)
 
-        self.dev.create_bunch(71)
-        self.assertEqual(self.dev.next_id(), 71)
+        dev.create_bunch(71)
+        assert 71 == dev.next_id()
 
-        with self.assertRaises(IndexError):
-            self.dev.create_bunch(212)
+        with pytest.raises(IndexError):
+            dev.create_bunch(212)
+
+    def test_devices_repr(self):
+
+        dev = Device(0)
+        assert repr(dev) == "<Device osd.0>"
+
+        devs = Devices()
+        devs.create_bunch(10)
+        assert repr(devs) == "<Devices count=10>"

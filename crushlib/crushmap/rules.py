@@ -178,7 +178,7 @@ class StepTake(Step):
 class StepEmit(Step):
     """Represents an "emit" step"""
 
-    name = 'edit'
+    name = 'emit'
 
     def __str__(self):
         return "\tstep emit"

@@ -137,9 +137,9 @@ class TestCRUSHmap(object):
 
     def test_reweight_subtree(self, crushmap):
         """:type crushmap: CrushMap"""
-        crushmap.reweight_subtree('host1', 2.0)
+        crushmap.reweight_subtree('psu0', 2.0)
         assert all(w == 2.0 for w in crushmap.get_item('host1').items.values())
-        assert crushmap.get_item('root').weight() == 20.0
+        assert crushmap.get_item('root').weight() == 24.0
 
     def test_edit_rule_root(self, crushmap):
         """:type crushmap: CrushMap"""
