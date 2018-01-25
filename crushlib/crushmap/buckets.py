@@ -130,7 +130,7 @@ class Bucket(object):
 
     def __hash__(self):
         """Hack that allows using these objects as keys"""
-        return hash(self.name)
+        return hash(self.id)
 
     def __str__(self):
         hash_id = 0  # There is no other possibility anyway

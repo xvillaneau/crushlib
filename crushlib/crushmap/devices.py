@@ -113,4 +113,4 @@ class Device(object):
         return "<Device {}>".format(self.name)
 
     def __hash__(self):
-        return hash(self.name)
+        return hash(self.id)

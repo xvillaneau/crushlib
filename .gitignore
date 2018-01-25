@@ -23,6 +23,8 @@
 *.pyo
 *__pycache__*
 .cache
+/build/
+/dist/
 
 # PyCharm
 /.idea
