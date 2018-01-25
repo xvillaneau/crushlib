@@ -7,7 +7,7 @@ from __future__ import absolute_import, division, \
                        print_function, unicode_literals
 import re
 from . import Rule, Steps, Bucket
-from .rules import StepTake, StepChoose, StepEmit
+from .rules import StepTake, StepChoose, StepEmit, StepSet
 
 
 def parse_raw(crushmap, map_obj):
@@ -184,6 +184,10 @@ def _parse_rules(map_obj, rules_list):
                     steps.add_step(step)
                 elif op == 'emit':
                     steps.add_step(StepEmit())
+                elif op.startswith('set_'):
+                    opt = op[4:]
+                    val = int(l[2])
+                    steps.add_step(StepSet(opt, val))
                 else:
                     raise ValueError("Unknown operation {}".format(op))
             else:

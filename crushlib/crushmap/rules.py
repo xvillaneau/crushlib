@@ -146,9 +146,17 @@ class Steps(object):
         :type step_obj: Step
         """
 
-        take_required = self.is_complete() or not self.__list
-        if take_required != isinstance(step_obj, StepTake):
-            raise ValueError("First step of a sequence MUST be 'take'")
+        if not self.__list:
+            if not isinstance(step_obj, (StepSet, StepTake)):
+                raise ValueError("First step MUST be 'take' or 'set_...'")
+        else:
+            prev = self.__list[-1]
+            prev_set = isinstance(prev, StepSet)
+            if isinstance(step_obj, StepSet) and not prev_set:
+                raise ValueError("Can only add 'set_' steps at the start")
+            if isinstance(step_obj, StepTake) != (self.is_complete() or prev_set):
+                raise ValueError("First step of a sequence MUST be 'take'")
+
         self.__list.append(step_obj)
 
     def is_complete(self):
@@ -185,6 +193,26 @@ class StepEmit(Step):
 
     def __str__(self):
         return "\tstep emit"
+
+
+class StepSet(Step):
+    """
+    Represents a "set_" step
+    e.g. "step set_chooseleaf_tries 5"
+    """
+
+    def __init__(self, opt, value):
+        assert opt in ('chooseleaf_tries', 'choose_tries')
+        self.opt = opt
+        self.val = value
+
+    @property
+    def name(self):
+        """Name of the rule. Depends on the options"""
+        return 'set_' + self.opt
+
+    def __str__(self):
+        return "\tstep set_{} {}".format(self.opt, self.val)
 
 
 class StepChoose(Step):

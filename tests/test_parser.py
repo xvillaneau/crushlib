@@ -74,8 +74,8 @@ class TestParser(unittest.TestCase):
         self.test_buckets_parsing()
         _parse_rules(self.map, [[
             'rule replicated_ruleset {', 'ruleset 0', 'type replicated',
-            'min_size 1', 'max_size 10', 'step take root',
-            'step chooseleaf firstn 0 type host', 'step emit']])
+            'min_size 1', 'max_size 10', 'step set_chooseleaf_tries 5',
+            'step take root', 'step chooseleaf firstn 0 type host', 'step emit']])
         with self.assertRaises(ValueError):
             _parse_rules(self.map, [['step helloworld']])
         with self.assertRaises(ValueError):
