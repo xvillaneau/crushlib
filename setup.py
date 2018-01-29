@@ -1,10 +1,10 @@
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='crushlib',
     version='0.1.0',
-    packages=['crushlib'],
+    packages=find_packages(),
     license='GNU LGPLv3',
     author='Xavier Villaneau',
     author_email='xvillaneau@gmail.com',
