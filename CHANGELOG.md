@@ -1,6 +1,10 @@
 
 # Change Log for CRUSHlib
 
+## Version 0.1.1 - Fixed packaging
+
+- Bug: `crushlib.crushmap` was not being packaged
+
 ## Version 0.1.0 - Initial pre-release
 
 Initial pre-release with limited functionality.

@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='crushlib',
-    version='0.1.0',
+    version='0.1.1',
     packages=find_packages(),
     license='GNU LGPLv3',
     author='Xavier Villaneau',
