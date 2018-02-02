@@ -22,6 +22,14 @@ def crushmap_missing_dev(crushmap_empty):
 
 
 @pytest.fixture
+def crushmap_wrong_order(crushmap_empty):
+    """:type crushmap_empty: CrushMap"""
+    crush_file = os.path.join(FILES_DIR, 'crushmap_unordered_buckets.txt')
+    crushmap_empty.read_file(crush_file)
+    yield crushmap_empty
+
+
+@pytest.fixture
 def crushmap(crushmap_empty):
     """:type crushmap_empty: CrushMap"""
     crush_file = os.path.join(FILES_DIR, 'crushmap_complete.txt')

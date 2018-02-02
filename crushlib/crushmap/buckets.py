@@ -26,7 +26,10 @@ class Buckets(object):
 
     def __str__(self):
         out = ""
-        for b in self.__list:
+        buckets = self.__list[:]  # Shallow copy
+        while buckets:
+            b = next(b for b in buckets if all(i not in buckets for i in b.items))
+            buckets.remove(b)
             out += str(b)
         return out
 

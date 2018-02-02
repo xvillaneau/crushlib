@@ -32,6 +32,11 @@ class TestCRUSHmap(object):
         """Test that maps are properly printed"""
         assert crushmap_missing_dev.raw_map == str(crushmap_missing_dev)
 
+    def test_print_wrong_order(self, crushmap_wrong_order):
+        """Test that a CRUSHMap with bucket order that does not
+        match the ID order is still preserved"""
+        assert crushmap_wrong_order.raw_map == str(crushmap_wrong_order)
+
     def test_get_item(self):
         """Test CRUSHmap.get_item()"""
         crushmap = CrushMap.create(4, [('host', 2)])
