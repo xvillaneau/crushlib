@@ -1,6 +1,11 @@
 
 # Change Log for CRUSHlib
 
+## Version 0.1.2 - Fixed bucket order
+
+- Bug: Buckets would not be printed in reverse hierarchy
+  order, causing compilation errors.
+
 ## Version 0.1.1 - Fixed packaging
 
 - Bug: `crushlib.crushmap` was not being packaged
