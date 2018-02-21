@@ -1,6 +1,11 @@
 
 # Change Log for CRUSHlib
 
+## Version 0.1.3 - Fixed support for 'set' steps
+
+- Bug: Multiple 'set' steps in a rule were being considered
+  invalid syntax despite being common for erasure-coding
+
 ## Version 0.1.2 - Fixed bucket order
 
 - Bug: Buckets would not be printed in reverse hierarchy
