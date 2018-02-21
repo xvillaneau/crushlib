@@ -152,9 +152,10 @@ class Steps(object):
         else:
             prev = self.__list[-1]
             prev_set = isinstance(prev, StepSet)
-            if isinstance(step_obj, StepSet) and not prev_set:
-                raise ValueError("Can only add 'set_' steps at the start")
-            if isinstance(step_obj, StepTake) != (self.is_complete() or prev_set):
+            if isinstance(step_obj, StepSet):
+                if not prev_set:
+                    raise ValueError("Can only add 'set_' steps at the start")
+            elif isinstance(step_obj, StepTake) != (self.is_complete() or prev_set):
                 raise ValueError("First step of a sequence MUST be 'take'")
 
         self.__list.append(step_obj)
