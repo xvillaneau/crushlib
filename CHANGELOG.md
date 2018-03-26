@@ -1,6 +1,11 @@
 
 # Change Log for CRUSHlib
 
+## Version 0.2.0 - Added Jewel support
+
+- Feature: Support for Jewel profile tunables
+- Bug: Fixed crash when trying to print CRUSH map with no devices
+
 ## Version 0.1.3 - Fixed support for 'set' steps
 
 - Bug: Multiple 'set' steps in a rule were being considered
