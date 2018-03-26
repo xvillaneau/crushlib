@@ -17,7 +17,7 @@ class TestTunables(unittest.TestCase):
     def test_setprofile(self):
         """Test Tunables.set_profile()"""
 
-        for p in ('legacy', 'argonaut', 'bobtail', 'firefly', 'hammer'):
+        for p in ('legacy', 'argonaut', 'bobtail', 'firefly', 'hammer', 'jewel'):
             self.tun.set_profile(p)
         with self.assertRaises(ValueError):
             self.tun.set_profile('test')

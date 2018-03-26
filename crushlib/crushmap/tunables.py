@@ -66,6 +66,16 @@ class Tunables(object):
                 'chooseleaf_vary_r': 1,
                 'allowed_bucket_algs': 54
             }
+        elif profile == 'jewel':
+            self.settings = {
+                'choose_local_tries': 0,
+                'choose_local_fallback_tries': 0,
+                'choose_total_tries': 50,
+                'chooseleaf_descend_once': 1,
+                'chooseleaf_vary_r': 1,
+                'chooseleaf_stable': 1,
+                'allowed_bucket_algs': 54
+            }
         else:
             raise ValueError("Unknown profile {}".format(profile))
 
