@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, \
                        print_function
 import os
 import pytest
+import textwrap
 
 from crushlib.crushmap import CrushMap, Type, Bucket, Rule
 
@@ -160,3 +161,33 @@ class TestCRUSHmap(object):
         crushmap.rules.add_rule(r)
         with pytest.raises(ValueError):
             crushmap.edit_rule_root('test', 'psu0')
+
+    def test_crushmap_no_devices(self, crushmap_empty):
+        """:type crushmap_empty: CrushMap"""
+
+        crushmap_empty.tunables.set_profile('firefly')
+        crushmap_empty.types.create_set(['osd', 'host', 'root'])
+
+        empty_str = textwrap.dedent("""
+        # begin crush map
+        tunable choose_local_tries 0
+        tunable choose_local_fallback_tries 0
+        tunable choose_total_tries 50
+        tunable chooseleaf_descend_once 1
+        tunable chooseleaf_vary_r 1
+        
+        # devices
+        
+        # types
+        type 0 osd
+        type 1 host
+        type 2 root
+        
+        # buckets
+        
+        # rules
+        
+        # end crush map
+        """)
+
+        assert str(crushmap_empty).strip() == empty_str.strip()
