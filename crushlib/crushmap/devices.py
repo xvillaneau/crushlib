@@ -18,6 +18,8 @@ class Devices(object):
 
     def __str__(self):
         nums = [dev.id for dev in self.__list]
+        if not nums:
+            return ""
         out = ""
         for i in range(0, max(nums) + 1):
             name = self.get_device(dev_id=i).name if i in nums else 'device' + str(i)
