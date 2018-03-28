@@ -64,6 +64,7 @@ class Tunables(object):
                 'choose_total_tries': 50,
                 'chooseleaf_descend_once': 1,
                 'chooseleaf_vary_r': 1,
+                'straw_calc_version': 1,
                 'allowed_bucket_algs': 54
             }
         elif profile == 'jewel':
@@ -73,6 +74,7 @@ class Tunables(object):
                 'choose_total_tries': 50,
                 'chooseleaf_descend_once': 1,
                 'chooseleaf_vary_r': 1,
+                'straw_calc_version': 1,
                 'chooseleaf_stable': 1,
                 'allowed_bucket_algs': 54
             }
