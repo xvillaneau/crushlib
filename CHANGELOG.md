@@ -1,6 +1,10 @@
 
 # Change Log for CRUSHlib
 
+## Version 0.2.1 - Fixed straw2 buckets
+
+- Bug: Hammer and Jewel tunables profiles were not using straw2
+
 ## Version 0.2.0 - Added Jewel support
 
 - Feature: Support for Jewel profile tunables
