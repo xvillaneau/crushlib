@@ -15,9 +15,6 @@
 # Vagrant
 /.vagrant
 
-# Configuration
-/*.cfg
-
 # Python
 *.pyc
 *.pyo
