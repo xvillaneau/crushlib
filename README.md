@@ -27,4 +27,15 @@ Being still WIP, CRUSHlib does _not_ support yet:
 
 ## Installation
 
-WIP, will expand once the package is on PyPi
+CRUSHlib is [available on PyPi](https://pypi.org/project/crushlib/)!
+Installation can be done quite simply with:
+
+    pip install crushlib
+
+CRUSHlib currently does not have any dependencies, and is compatible with
+both Python 2.7 and 3.6.
+
+## License
+
+Copyright ©2018 Xavier Villaneau \
+Licensed under GNU LGPL v3.0, see `LICENSE.txt` for details.
